@@ -1,6 +1,7 @@
-import 'dart:ffi';
-
 import 'package:desktop2/components/distritos/distritos.dart';
+import 'package:desktop2/components/ruteowidgets/agendados.dart';
+import 'package:desktop2/components/ruteowidgets/rutas.dart';
+import 'package:desktop2/components/ruteowidgets/tiemporeal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -194,14 +195,14 @@ class _RuteoState extends State<Ruteo> {
   ];
   TextEditingController _text1 = TextEditingController();
   List<Vehiculo> vehiculos = [];
-  List<Conductor>conductorget = [];
- late Color colormarcador;
- int idConductor = 0;
- int idVehiculo = 0;
- int rutaIdLast = 0;
-  List<int>idPedidosSeleccionados =[];
- 
- Future<dynamic> createRuta(
+  List<Conductor> conductorget = [];
+  late Color colormarcador;
+  int idConductor = 0;
+  int idVehiculo = 0;
+  int rutaIdLast = 0;
+  List<int> idPedidosSeleccionados = [];
+
+  Future<dynamic> createRuta(
       empleado_id, conductor_id, vehiculo_id, distancia, tiempo) async {
     try {
       //    print("Create ruta....");
@@ -210,8 +211,7 @@ class _RuteoState extends State<Ruteo> {
       //print("vehiculo_id");
       //print(vehiculo_id);
 
-      
-        DateTime now = DateTime.now();
+      DateTime now = DateTime.now();
 
       String formateDateTime = now.toString();
       await http.post(Uri.parse(api + apiRutaCrear),
@@ -229,6 +229,7 @@ class _RuteoState extends State<Ruteo> {
       throw Exception("$e");
     }
   }
+
   // LAST RUTA BY EMPRLEADOID
   Future<dynamic> lastRutaEmpleado(empleadoId) async {
     var res = await http.get(
@@ -255,7 +256,7 @@ class _RuteoState extends State<Ruteo> {
     // print(ruta_id);
 
     //ALMACENO LA RUTA EN EL PROVIDER PARA ESE CONDUCTOR
-   // Provider.of<RutaProvider>(context, listen: false).updateUser(ruta_id);
+    // Provider.of<RutaProvider>(context, listen: false).updateUser(ruta_id);
   }
 
   // CREAR Y OBTENER
@@ -270,7 +271,7 @@ class _RuteoState extends State<Ruteo> {
   Future<dynamic> getConductores() async {
     try {
       SharedPreferences empleadoShare = await SharedPreferences.getInstance();
-      var empleadoIDs = 1;//empleadoShare.getInt('empleadoID');
+      var empleadoIDs = 1; //empleadoShare.getInt('empleadoID');
       print("El empleado traido es");
       print(empleadoIDs);
       var res = await http.get(
@@ -296,7 +297,7 @@ class _RuteoState extends State<Ruteo> {
       throw Exception('$e');
     }
   }
-  
+
   Future<dynamic> getVehiculos() async {
     SharedPreferences empleadoShare = await SharedPreferences.getInstance();
     try {
@@ -360,19 +361,18 @@ class _RuteoState extends State<Ruteo> {
               telefono: data['telefono'] ?? '');
         }).toList();
 
-        
         setState(() {
           pedidosget = tempPedido;
           print("---pedidos get");
-        print(pedidosget.length);
-
+          print(pedidosget.length);
 
           // TRAIGO LOS DISTRITOS DE LOS PEDIDOS DE AYER - SOLO LOS DE AYER
 
           for (var j = 0; j < pedidosget.length; j++) {
             fechaparseadas = DateTime.parse(pedidosget[j].fecha.toString());
             if (pedidosget[j].estado == 'pendiente') {
-              if (pedidosget[j].tipo == 'normal'|| pedidosget[j].tipo=='express') {
+              if (pedidosget[j].tipo == 'normal' ||
+                  pedidosget[j].tipo == 'express') {
                 if (fechaparseadas.day != now.day) {
                   setState(() {
                     distritosSet.add(pedidosget[j].distrito.toString());
@@ -395,12 +395,12 @@ class _RuteoState extends State<Ruteo> {
             for (var j = 0; j < pedidosget.length; j++) {
               fechaparseadas = DateTime.parse(pedidosget[j].fecha.toString());
               if (pedidosget[j].estado == 'pendiente') {
-
-                if (pedidosget[j].tipo == 'normal' || pedidosget[j].tipo=='express') {
+                if (pedidosget[j].tipo == 'normal' ||
+                    pedidosget[j].tipo == 'express') {
                   print("----------TIPO");
                   print(pedidosget[j].tipo);
                   if (fechaparseadas.day != now.day) {
-                    if (distrito_de_pedido[x] == pedidosget[j].distrito) { 
+                    if (distrito_de_pedido[x] == pedidosget[j].distrito) {
                       nuevopedidodistrito.add(pedidosget[j]);
                       print("nuevo pedido distrito ID:");
                       print(pedidosget[j].id);
@@ -413,7 +413,6 @@ class _RuteoState extends State<Ruteo> {
                   }
                 }
               }
-
             }
             //SALGO DEL 2DO FOR, PORQUE YA AÑADI SOLO LOS PEDIDOS DE UN DISTRITO EN ESPECIFICO
             // FINALMENTE ESA SERIA LA CLAVE Y EL CONJUNTO DE PEDIDOS DE ESE DISTRITO
@@ -431,7 +430,8 @@ class _RuteoState extends State<Ruteo> {
             fechaparseadas = DateTime.parse(pedidosget[i].fecha.toString());
             if (pedidosget[i].estado == 'pendiente') {
               // print("pendi...");
-              if (pedidosget[i].tipo == 'normal'||pedidosget[i].tipo=='express') {
+              if (pedidosget[i].tipo == 'normal' ||
+                  pedidosget[i].tipo == 'express') {
                 // print("normlllll");
                 // SI ES NORMAL
                 if (fechaparseadas.day != now.day) {
@@ -454,7 +454,7 @@ class _RuteoState extends State<Ruteo> {
                     print(agendados);
                   });
                 }
-              } 
+              }
             } else {
               setState(() {});
             }
@@ -483,11 +483,8 @@ class _RuteoState extends State<Ruteo> {
   }
 
   void marcadoresPut(tipo) {
-    setState(() {
-      
-    });
+    setState(() {});
     if (tipo == 'agendados') {
-      
       int count = 1;
 
       final Map<LatLng, Pedido> mapaLatPedido = {};
@@ -597,9 +594,9 @@ class _RuteoState extends State<Ruteo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Color.fromARGB(255, 91, 89, 107).withOpacity(0.95),
       body: Container(
-          padding: EdgeInsets.all(19),
+          padding: const EdgeInsets.all(19),
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: Row(
@@ -607,109 +604,28 @@ class _RuteoState extends State<Ruteo> {
               const SizedBox(
                 width: 10,
               ),
+
               // ITEMS
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      const Text(
-                        "Agendados",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Color.fromARGB(255, 231, 231, 231)),
-                        width: MediaQuery.of(context).size.width / 8,
-                        height: MediaQuery.of(context).size.height/1.1,
-                        child: number > 0
-                            ? ListView.builder(
-                                padding: const EdgeInsets.all(8),
-                                itemCount: number, // cantidad de pedidos
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Container(
-                                    height: 200,
-                                    margin: EdgeInsets.all(5),
-                                    color: Color.fromARGB(255, 174, 151, 179),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Center(
-                                            child: Text(
-                                          'Pedido N: ${agendados[index].id} ',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        )),
-                                        Text(
-                                            "Estado: ${agendados[index].estado}"),
-                                        Text(
-                                            "Fecha: ${agendados[index].fecha}"),
-                                        Text(
-                                            "Total:S/.${agendados[index].total}"),
-                                        Text(
-                                            "Nombres: ${agendados[index].nombre}"),
-                                        Text(
-                                            "Apellidos: ${agendados[index].apellidos}"),
-                                        Text(
-                                            "Distrito:${agendados[index].distrito}")
-                                      ],
-                                    ),
-                                  );
-                                })
-                            : Container(
-                                child: const Center(
-                                    child: Text(
-                                  "No hay pedidos agendados.\n Espera al próximo día.",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                  textAlign: TextAlign.center,
-                                )),
-                              ),
-                      ),
-                    ],
-                  ),
-                 
-                ],
-              ),
+              const Agendados(),
+
               const SizedBox(
                 width: 10,
               ),
+
               // TIEMPO REAL
-              Column(
-                children: [
-                  Text("Tiempo Real"),
-                  Container(
-                    color: Colors.grey,
-                    height: MediaQuery.of(context).size.height / 1.08,
-                    width: 300,
-                    child: ListView.builder(
-                        itemCount: 900,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Container(
-                            padding: EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20)),
-                            margin: EdgeInsets.all(10),
-                            child: Text("Pedido X :"),
-                          );
-                        }),
-                  )
-                ],
-              ),
+              const Tiemporeal(),
+
               const SizedBox(
                 width: 10,
               ),
+
               //MAPA
               Column(
                 children: [
-                  Text("Mapa de pedidos"),
+                  Text("Mapa de pedidos",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,
+                  fontSize: MediaQuery.of(context).size.height/35),),
                   Container(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                         //color: Color.fromARGB(255, 198, 172, 181),
                         borderRadius: BorderRadius.circular(20)),
@@ -754,15 +670,18 @@ class _RuteoState extends State<Ruteo> {
                                             .withOpacity(0.35),
                                         builder: (BuildContext context) {
                                           return Dialog(
-                                            backgroundColor: Color.fromARGB(255, 205, 190, 216),
+                                            backgroundColor:
+                                                const Color.fromARGB(
+                                                    255, 205, 190, 216),
                                             surfaceTintColor:
-                                                Color.fromARGB(255, 219, 212, 227),
+                                                const Color.fromARGB(
+                                                    255, 219, 212, 227),
                                             child: Container(
                                               decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           20)),
-                                              padding: EdgeInsets.all(15),
+                                              padding: const EdgeInsets.all(15),
                                               height: MediaQuery.of(context)
                                                       .size
                                                       .height /
@@ -791,22 +710,38 @@ class _RuteoState extends State<Ruteo> {
                                                   // LIST VIEW DE PEDIDOS DISTRITOS
                                                   Container(
                                                     child: Row(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         // DROPS
                                                         Container(
-                                                          width: MediaQuery.of(context).size.width/6,
-                                                          height: MediaQuery.of(context).size.height/2,
-                                                          padding: EdgeInsets.all(10),
-                                                          color: const Color.fromARGB(255, 250, 203, 219),
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width /
+                                                              6,
+                                                          height: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .height /
+                                                              2,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          color: const Color
+                                                              .fromARGB(255,
+                                                              250, 203, 219),
                                                           child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
                                                             children: [
-                                                              
                                                               Container(
-                                                                color: Colors.white,
+                                                                color: Colors
+                                                                    .white,
                                                                 padding:
-                                                                    EdgeInsets
+                                                                    const EdgeInsets
                                                                         .all(8),
                                                                 child:
                                                                     TextField(
@@ -823,14 +758,20 @@ class _RuteoState extends State<Ruteo> {
                                                                 ),
                                                               ),
                                                               Container(
-                                                                width: MediaQuery.of(context).size.width/6,
-                                                                color: Colors.white,
+                                                                width: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width /
+                                                                    6,
+                                                                color: Colors
+                                                                    .white,
                                                                 padding:
-                                                                    EdgeInsets
+                                                                    const EdgeInsets
                                                                         .all(8),
-                                                                
                                                                 child: Column(
-                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
                                                                   children: [
                                                                     Text(
                                                                         "Conductores"),
@@ -869,15 +810,22 @@ class _RuteoState extends State<Ruteo> {
                                                               ),
                                                               // VEHICULOS-----------
                                                               Container(
-                                                                color: Colors.white,
-                                                                width: MediaQuery.of(context).size.width/6,
+                                                                color: Colors
+                                                                    .white,
+                                                                width: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width /
+                                                                    6,
                                                                 padding:
-                                                                    EdgeInsets
+                                                                    const EdgeInsets
                                                                         .all(8),
                                                                 child: Column(
-                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
                                                                   children: [
-                                                                    Text(
+                                                                    const Text(
                                                                         "Vehículos"),
                                                                     StatefulBuilder(builder: (BuildContext
                                                                             context,
@@ -915,168 +863,176 @@ class _RuteoState extends State<Ruteo> {
                                                             ],
                                                           ),
                                                         ),
-                                                        const SizedBox(width: 20,),
+                                                        const SizedBox(
+                                                          width: 20,
+                                                        ),
                                                         //LISTVIEW
                                                         Container(
-        width: MediaQuery.of(context).size.width / 4,
-        height: MediaQuery.of(context).size.height / 2.5,
-        padding: const EdgeInsets.all(10),
-        color: Color.fromARGB(255, 242, 222, 255),
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onHorizontalDragUpdate: (details) {
-            _scrollController2.jumpTo(
-                _scrollController2.position.pixels + details.primaryDelta!);
-          },
-          child: SingleChildScrollView(
-            controller: _scrollController2,
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(
-                distrito_de_pedido.length,
-                (index) => Container(
-                  width: 250,
-                  
-                  margin: const EdgeInsets.only(left: 10),
-                  padding: const EdgeInsets.all(8),
-                  child: Card(
-                    elevation: 8,
-                    borderOnForeground: true,
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          // NOMBRE DEL DISTRITO DINAMICO
-                          Text(distrito_de_pedido[index]),
-                          Container(
-                            width: 200,
-                            height: 200,
-                            //color: Colors.blue,
-                            margin: EdgeInsets.all(5),
-                            child: ListView.builder(
-                              itemCount:distrito_pedido['${distrito_de_pedido[index]}']!.length ,
-                              itemBuilder: (BuildContext context,int index2){
-                                return StatefulBuilder(
-                                  builder: (BuildContext context,
-                                    StateSetter setState){return Container(
-                                      margin: EdgeInsets.all(5),
-                                      color: Color.fromARGB(255, 153, 218, 222),
-                                      child: CheckboxListTile(
-                                                value: distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado,
-                                                onChanged: (bool? value) {
-                                                  setState(() {
-                                                    print("seleccionando");
-                                                    
-                                                    distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado = value!;
-                                                    print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado);
-                                                    print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].id);
-                                                   
-                                                   
-                                                    idPedidosSeleccionados.add(distrito_pedido['${distrito_de_pedido[index]}']![index2].id);
-                                                  });
-                                                  
-                                                },
-                                                title: Text("N° ${distrito_pedido['${distrito_de_pedido[index]}']?[index2].id}"),
-                                                subtitle: Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].nombre}"),
-                                              ),
-                                    );}
-                                );
-                              },
-                            ), /*Column(
-                              children: 
-                                List.generate(distrito_pedido['${distrito_de_pedido[index]}']!.length, (index2)=>Container(
-                                  child: Column(
-                                    children: [
-                                      
-                                      Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].nombre}")
-                                    ],
-                                  ),
-                                )),
-                              
-                            )*/
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-                                                        const SizedBox(width: 20,),
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width /
+                                                              4,
+                                                          height: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .height /
+                                                              2.5,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          color: const Color
+                                                              .fromARGB(255,
+                                                              242, 222, 255),
+                                                          child:
+                                                              GestureDetector(
+                                                            behavior:
+                                                                HitTestBehavior
+                                                                    .translucent,
+                                                            onHorizontalDragUpdate:
+                                                                (details) {
+                                                              _scrollController2.jumpTo(
+                                                                  _scrollController2
+                                                                          .position
+                                                                          .pixels +
+                                                                      details
+                                                                          .primaryDelta!);
+                                                            },
+                                                            child:
+                                                                SingleChildScrollView(
+                                                              controller:
+                                                                  _scrollController2,
+                                                              scrollDirection:
+                                                                  Axis.horizontal,
+                                                              child: Row(
+                                                                children: List
+                                                                    .generate(
+                                                                  distrito_de_pedido
+                                                                      .length,
+                                                                  (index) =>
+                                                                      Container(
+                                                                    width: 250,
+                                                                    margin: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10),
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .all(
+                                                                            8),
+                                                                    child: Card(
+                                                                      elevation:
+                                                                          8,
+                                                                      borderOnForeground:
+                                                                          true,
+                                                                      color: Colors
+                                                                          .white,
+                                                                      child:
+                                                                          Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .all(
+                                                                            8.0),
+                                                                        child:
+                                                                            Column(
+                                                                          children: [
+                                                                            // NOMBRE DEL DISTRITO DINAMICO
+                                                                            Text(distrito_de_pedido[index]),
+                                                                            Container(
+                                                                              width: 200,
+                                                                              height: 200,
+                                                                              //color: Colors.blue,
+                                                                              margin: const EdgeInsets.all(5),
+                                                                              child: ListView.builder(
+                                                                                itemCount: distrito_pedido['${distrito_de_pedido[index]}']!.length,
+                                                                                itemBuilder: (BuildContext context, int index2) {
+                                                                                  return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+                                                                                    return Container(
+                                                                                      margin: const EdgeInsets.all(5),
+                                                                                      color: const Color.fromARGB(255, 153, 218, 222),
+                                                                                      child: CheckboxListTile(
+                                                                                        value: distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado,
+                                                                                        onChanged: (bool? value) {
+                                                                                          setState(() {
+                                                                                            print("seleccionando");
+
+                                                                                            distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado = value!;
+                                                                                            print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado);
+                                                                                            print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].id);
+
+                                                                                            idPedidosSeleccionados.add(distrito_pedido['${distrito_de_pedido[index]}']![index2].id);
+                                                                                          });
+                                                                                        },
+                                                                                        title: Text("N° ${distrito_pedido['${distrito_de_pedido[index]}']?[index2].id}"),
+                                                                                        subtitle: Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].nombre}"),
+                                                                                      ),
+                                                                                    );
+                                                                                  });
+                                                                                },
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 20,
+                                                        ),
 
                                                         // MAPA DIALOGO
                                                         Container(
-                                                          width: MediaQuery.of(context).size.width/3.5,
-                                                          height: MediaQuery.of(context).size.height/1.72,
-                                                          padding: EdgeInsets.all(10),
-                                                          color: Color.fromARGB(255, 190, 230, 221),
-                                                         // color: Colors.pink,
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width /
+                                                              3.5,
+                                                          height: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .height /
+                                                              1.72,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          color: const Color
+                                                              .fromARGB(255,
+                                                              190, 230, 221),
+                                                          // color: Colors.pink,
                                                           child: FlutterMap(
-                          options: const MapOptions(
-                            initialCenter: LatLng(-16.4055657, -71.5719081),
-                            initialZoom: 10.85,
-                          ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                              userAgentPackageName: 'com.example.app',
-                            ),
-                            MarkerLayer(
-                              markers: [
-                                ...marcadores,
-                                //...expressmarker,
-                                // ...normalmarker,
-                              ],
-                            ),
-                          ],
-                        ),
+                                                            options:
+                                                                const MapOptions(
+                                                              initialCenter: LatLng(
+                                                                  -16.4055657,
+                                                                  -71.5719081),
+                                                              initialZoom:
+                                                                  10.85,
+                                                            ),
+                                                            children: [
+                                                              TileLayer(
+                                                                urlTemplate:
+                                                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                userAgentPackageName:
+                                                                    'com.example.app',
+                                                              ),
+                                                              MarkerLayer(
+                                                                markers: [
+                                                                  ...marcadores,
+                                                                  //...expressmarker,
+                                                                  // ...normalmarker,
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
                                                         )
-
                                                       ],
                                                     ),
                                                   ),
-                                                  /*Container(
-                                                    height: 100*2,
-                                                    child: ListView.builder(
-                                                      itemCount: distrito_de_pedido.length,
-                                                      itemBuilder: (BuildContext context,int index){
-                                                      return Container(
-                                                        
-                                                        child: Column(children: [
-                                                          Text("Distrito:${distrito_de_pedido[index]}"),
-                                                         Container(
-                                                            height: 50,
-                                                            child: ListView.builder(
-                                                              itemCount:distrito_pedido['${distrito_de_pedido[index]}']?.length,
-                                                              itemBuilder: (BuildContext context,int index2){
-                                                                return Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].apellidos}");
-                                                            }),
-                                                          ),
-                                                          DropdownButton<String>(
-            hint: const Text('Select a color'),
-            value: selectedColor,
-            items: colors.map((String color) {
-              return DropdownMenuItem<String>(
-                value: color,
-                child: Text(color),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedColor = newValue;
-              });
-            },
-          )
 
-                                                        ],),
-                                                      );
-                                                    }),
-                                                  ),*/
                                                   const SizedBox(
                                                     height: 49,
                                                   ),
@@ -1088,22 +1044,44 @@ class _RuteoState extends State<Ruteo> {
                                                               Navigator.pop(
                                                                   context);
                                                             },
-                                                            child: Text("Cerrar")),
+                                                            child:
+                                                                Text("Cerrar")),
                                                       ),
                                                       Container(
-                                                        
-                                                        child: ElevatedButton(onPressed: ()async{
-                                                          print("iid.........s");
-                                                          print(selectedConductor!.id);
-                                                          print(selectedVehiculo!.id);
-                                                          await crearobtenerYactualizarRuta(1, selectedConductor!.id, selectedVehiculo!.id, 0, 0,'en proceso');
+                                                        child: ElevatedButton(
+                                                            onPressed:
+                                                                () async {
+                                                              print(
+                                                                  "iid.........s");
+                                                              print(
+                                                                  selectedConductor!
+                                                                      .id);
+                                                              print(
+                                                                  selectedVehiculo!
+                                                                      .id);
+                                                              await crearobtenerYactualizarRuta(
+                                                                  1,
+                                                                  selectedConductor!
+                                                                      .id,
+                                                                  selectedVehiculo!
+                                                                      .id,
+                                                                  0,
+                                                                  0,
+                                                                  'en proceso');
 
-                                                          print("holiiiii");
-                                                        },
-                                                        style: ButtonStyle(
-                                                          backgroundColor: WidgetStateProperty.all(Colors.purple)
-                                                        ),
-                                                         child: Text(" Crear Ruta",style: TextStyle(color: Colors.white),)),
+                                                              print("holiiiii");
+                                                            },
+                                                            style: ButtonStyle(
+                                                                backgroundColor:
+                                                                    WidgetStateProperty
+                                                                        .all(Colors
+                                                                            .purple)),
+                                                            child: const Text(
+                                                              " Crear Ruta",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            )),
                                                       )
                                                     ],
                                                   )
@@ -1116,8 +1094,9 @@ class _RuteoState extends State<Ruteo> {
                                   style: ButtonStyle(
                                       elevation: WidgetStateProperty.all(20),
                                       backgroundColor: WidgetStateProperty.all(
-                                          Color.fromARGB(255, 103, 84, 175))),
-                                  child: Text(
+                                          const Color.fromARGB(
+                                              255, 103, 84, 175))),
+                                  child: const Text(
                                     "Crear ruta",
                                     style: TextStyle(
                                         fontSize: 11, color: Colors.white),
@@ -1128,473 +1107,9 @@ class _RuteoState extends State<Ruteo> {
                   ),
                 ],
               ),
+
               // RUTAS CREADAS
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 109, 157),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              Icons.visibility_outlined,
-                            )),
-                      ),
-                      const SizedBox(width: 30),
-                      Text(
-                        "Rutas Creadas",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      //color: Color.fromARGB(255, 206, 161, 195)
-                    ),
-                    width: MediaQuery.of(context).size.width / 8,
-                    height: MediaQuery.of(context).size.height / 1.12,
-                    child: 2 > 0
-                        ? ListView.builder(
-                            padding: const EdgeInsets.all(0),
-                            itemCount: 8,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                height: 150,
-                                margin: EdgeInsets.all(5),
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: Color.fromARGB(255, 214, 214, 214),
-                                ),
-                                child: Center(
-                                    child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text('Ruta Pato'),
-                                        IconButton(
-                                            onPressed: () {},
-                                            icon: Icon(Icons.visibility)),
-                                        IconButton(
-                                            onPressed: () {},
-                                            icon: Icon(Icons.warehouse))
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text("Conductor: $index"),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
-                                        Text(
-                                          "20",
-                                          style: TextStyle(fontSize: 30),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text("Vehículo: $index"),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        Row(
-                                          children: [
-                                            IconButton(
-                                                onPressed: () {
-                                    showDialog(
-                                        context: context,
-                                        barrierColor: const Color.fromARGB(
-                                                255, 241, 204, 204)
-                                            .withOpacity(0.35),
-                                        builder: (BuildContext context) {
-                                          return Dialog(
-                                            backgroundColor: Color.fromARGB(255, 205, 190, 216),
-                                            surfaceTintColor:
-                                                Color.fromARGB(255, 219, 212, 227),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20)),
-                                              padding: EdgeInsets.all(15),
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height /
-                                                  1.2,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  1.3,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Center(
-                                                      child: Text(
-                                                    "Crea tu ruta",
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  )),
-                                                  const SizedBox(
-                                                    height: 50,
-                                                  ),
-
-                                                  // DROPS MENUS GENERICOS
-                                                  // LIST VIEW DE PEDIDOS DISTRITOS
-                                                  Container(
-                                                    child: Row(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        // DROPS
-                                                        Container(
-                                                          width: MediaQuery.of(context).size.width/6,
-                                                          height: MediaQuery.of(context).size.height/2,
-                                                          padding: EdgeInsets.all(10),
-                                                          color: const Color.fromARGB(255, 250, 203, 219),
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              
-                                                              Container(
-                                                                color: Colors.white,
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(8),
-                                                                child:
-                                                                    TextField(
-                                                                  controller:
-                                                                      _text1,
-                                                                  decoration:
-                                                                      const InputDecoration(
-                                                                    labelText:
-                                                                        'Nombre de ruta',
-                                                                  ),
-                                                                  keyboardType:
-                                                                      TextInputType
-                                                                          .number,
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                width: MediaQuery.of(context).size.width/6,
-                                                                color: Colors.white,
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(8),
-                                                                
-                                                                child: Column(
-                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                  children: [
-                                                                    Text(
-                                                                        "Conductores"),
-                                                                    StatefulBuilder(builder: (BuildContext
-                                                                            context,
-                                                                        StateSetter
-                                                                            setState) {
-                                                                      return DropdownButton(
-                                                                        hint: const Text(
-                                                                            'Conductores'),
-                                                                        value:
-                                                                            selectedConductor,
-                                                                        items: conductorget.map((Conductor
-                                                                            chofer) {
-                                                                          return DropdownMenuItem<
-                                                                              Conductor>(
-                                                                            value:
-                                                                                chofer,
-                                                                            child:
-                                                                                Text("${chofer.nombres}"),
-                                                                          );
-                                                                        }).toList(),
-                                                                        onChanged:
-                                                                            (Conductor?
-                                                                                newValue) {
-                                                                          setState(
-                                                                              () {
-                                                                            selectedConductor =
-                                                                                newValue;
-                                                                          });
-                                                                        },
-                                                                      );
-                                                                    }),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                              // VEHICULOS-----------
-                                                              Container(
-                                                                color: Colors.white,
-                                                                width: MediaQuery.of(context).size.width/6,
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(8),
-                                                                child: Column(
-                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                  children: [
-                                                                    Text(
-                                                                        "Vehículos"),
-                                                                    StatefulBuilder(builder: (BuildContext
-                                                                            context,
-                                                                        StateSetter
-                                                                            setState) {
-                                                                      return DropdownButton(
-                                                                        hint: const Text(
-                                                                            'Vehículos'),
-                                                                        value:
-                                                                            selectedVehiculo,
-                                                                        items: vehiculos.map((Vehiculo
-                                                                            auto) {
-                                                                          return DropdownMenuItem<
-                                                                              Vehiculo>(
-                                                                            value:
-                                                                                auto,
-                                                                            child:
-                                                                                Text("${auto.nombre_modelo}"),
-                                                                          );
-                                                                        }).toList(),
-                                                                        onChanged:
-                                                                            (Vehiculo?
-                                                                                newValue) {
-                                                                          setState(
-                                                                              () {
-                                                                            selectedVehiculo =
-                                                                                newValue;
-                                                                          });
-                                                                        },
-                                                                      );
-                                                                    }),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        const SizedBox(width: 20,),
-                                                        //LISTVIEW
-                                                        Container(
-        width: MediaQuery.of(context).size.width / 4,
-        height: MediaQuery.of(context).size.height / 2.5,
-        padding: const EdgeInsets.all(10),
-        color: Color.fromARGB(255, 242, 222, 255),
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onHorizontalDragUpdate: (details) {
-            _scrollController2.jumpTo(
-                _scrollController2.position.pixels + details.primaryDelta!);
-          },
-          child: SingleChildScrollView(
-            controller: _scrollController2,
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(
-                distrito_de_pedido.length,
-                (index) => Container(
-                  width: 250,
-                  
-                  margin: const EdgeInsets.only(left: 10),
-                  padding: const EdgeInsets.all(8),
-                  child: Card(
-                    elevation: 8,
-                    borderOnForeground: true,
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          // NOMBRE DEL DISTRITO DINAMICO
-                          Text(distrito_de_pedido[index]),
-                          Container(
-                            width: 200,
-                            height: 200,
-                            //color: Colors.blue,
-                            margin: EdgeInsets.all(5),
-                            child: ListView.builder(
-                              itemCount:distrito_pedido['${distrito_de_pedido[index]}']!.length ,
-                              itemBuilder: (BuildContext context,int index2){
-                                return StatefulBuilder(
-                                  builder: (BuildContext context,
-                                    StateSetter setState){return Container(
-                                      margin: EdgeInsets.all(5),
-                                      color: Color.fromARGB(255, 153, 218, 222),
-                                      child: CheckboxListTile(
-                                                value: distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado,
-                                                onChanged: (bool? value) {
-                                                  setState(() {
-                                                    print("seleccionando");
-                                                    
-                                                    distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado = value!;
-                                                    print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado);
-                                                    print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].id);
-                                                   
-                                                   
-                                                    idPedidosSeleccionados.add(distrito_pedido['${distrito_de_pedido[index]}']![index2].id);
-                                                  });
-                                                  
-                                                },
-                                                title: Text("N° ${distrito_pedido['${distrito_de_pedido[index]}']?[index2].id}"),
-                                                subtitle: Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].nombre}"),
-                                              ),
-                                    );}
-                                );
-                              },
-                            ), /*Column(
-                              children: 
-                                List.generate(distrito_pedido['${distrito_de_pedido[index]}']!.length, (index2)=>Container(
-                                  child: Column(
-                                    children: [
-                                      
-                                      Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].nombre}")
-                                    ],
-                                  ),
-                                )),
-                              
-                            )*/
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-                                                        const SizedBox(width: 20,),
-
-                                                        // MAPA DIALOGO
-                                                        Container(
-                                                          width: MediaQuery.of(context).size.width/3.5,
-                                                          height: MediaQuery.of(context).size.height/1.72,
-                                                          padding: EdgeInsets.all(10),
-                                                          color: Color.fromARGB(255, 190, 230, 221),
-                                                         // color: Colors.pink,
-                                                          child: FlutterMap(
-                          options: const MapOptions(
-                            initialCenter: LatLng(-16.4055657, -71.5719081),
-                            initialZoom: 10.85,
-                          ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                              userAgentPackageName: 'com.example.app',
-                            ),
-                            MarkerLayer(
-                              markers: [
-                                ...marcadores,
-                                //...expressmarker,
-                                // ...normalmarker,
-                              ],
-                            ),
-                          ],
-                        ),
-                                                        )
-
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  /*Container(
-                                                    height: 100*2,
-                                                    child: ListView.builder(
-                                                      itemCount: distrito_de_pedido.length,
-                                                      itemBuilder: (BuildContext context,int index){
-                                                      return Container(
-                                                        
-                                                        child: Column(children: [
-                                                          Text("Distrito:${distrito_de_pedido[index]}"),
-                                                         Container(
-                                                            height: 50,
-                                                            child: ListView.builder(
-                                                              itemCount:distrito_pedido['${distrito_de_pedido[index]}']?.length,
-                                                              itemBuilder: (BuildContext context,int index2){
-                                                                return Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].apellidos}");
-                                                            }),
-                                                          ),
-                                                          DropdownButton<String>(
-            hint: const Text('Select a color'),
-            value: selectedColor,
-            items: colors.map((String color) {
-              return DropdownMenuItem<String>(
-                value: color,
-                child: Text(color),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedColor = newValue;
-              });
-            },
-          )
-
-                                                        ],),
-                                                      );
-                                                    }),
-                                                  ),*/
-                                                  const SizedBox(
-                                                    height: 49,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Center(
-                                                        child: ElevatedButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: Text("Cerrar")),
-                                                      ),
-                                                      Container(
-                                                        
-                                                        child: ElevatedButton(onPressed: ()async{
-                                                          print("iid.........s");
-                                                          print(selectedConductor!.id);
-                                                          print(selectedVehiculo!.id);
-                                                          await crearobtenerYactualizarRuta(1, selectedConductor!.id, selectedVehiculo!.id, 0, 0,'en proceso');
-
-                                                          print("holiiiii");
-                                                        },
-                                                        style: ButtonStyle(
-                                                          backgroundColor: WidgetStateProperty.all(Colors.purple)
-                                                        ),
-                                                         child: Text("Actualizar ruta",style: TextStyle(color: Colors.white),)),
-                                                      )
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        });
-                                  },
-                                                icon: Icon(Icons.edit)),
-                                            IconButton(
-                                                onPressed: () {},
-                                                icon: Icon(Icons.delete))
-                                          ],
-                                        )
-                                      ],
-                                    )
-                                  ],
-                                )),
-                              );
-                            })
-                        : Container(
-                            child: Center(
-                                child: Text(
-                              "No hay rutas chiveras.",
-                              textAlign: TextAlign.center,
-                            )),
-                          ),
-                  ),
-                ],
-              )
+              const Rutas(),
             ],
           )),
     );
