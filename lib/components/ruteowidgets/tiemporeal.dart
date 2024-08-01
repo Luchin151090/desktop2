@@ -80,7 +80,6 @@ class _TiemporealState extends State<Tiemporeal> {
   double latitudtemp = 0.0;
   double longitudtemp = 0.0;
 
-
   void marcadoresPut(tipo) {
     final marcadorProvider =
         Provider.of<MarcadorProvider>(context, listen: false);
@@ -250,84 +249,89 @@ class _TiemporealState extends State<Tiemporeal> {
     }
   }
 
-Future<dynamic> getPedidos() async {
+  Future<dynamic> getPedidos() async {
     try {
-        var empleadoIDs = 1; // o empleadoShare.getInt('empleadoID');
-        var res = await http.get(
-            Uri.parse(api + apipedidos + '/' + empleadoIDs.toString()),
-            headers: {"Content-type": "application/json"}
-        );
-        
-        if (res.statusCode == 200) {
-            var data = json.decode(res.body);
-            List<Pedido> tempPedido = (data as List).map<Pedido>((data) {
-                return Pedido(
-                    id: data['id'],
-                    ruta_id: data['ruta_id'] ?? 0,
-                    subtotal: data['subtotal']?.toDouble() ?? 0.0,
-                    descuento: data['descuento']?.toDouble() ?? 0.0,
-                    total: data['total']?.toDouble() ?? 0.0,
-                    fecha: data['fecha'],
-                    tipo: data['tipo'],
-                    estado: data['estado'],
-                    latitud: data['latitud']?.toDouble() ?? 0.0,
-                    longitud: data['longitud']?.toDouble() ?? 0.0,
-                    nombre: data['nombre'] ?? '',
-                    apellidos: data['apellidos'] ?? '',
-                    telefono: data['telefono'] ?? ''
-                );
-            }).toList();
+      var empleadoIDs = 1; // o empleadoShare.getInt('empleadoID');
+      var res = await http.get(
+          Uri.parse(api + apipedidos + '/' + empleadoIDs.toString()),
+          headers: {"Content-type": "application/json"});
 
-            if (mounted) {
-                setState(() {
-                    pedidosget = tempPedido;
-                    int count = 1;
-                    for (var i = 0; i < pedidosget.length; i++) {
-                        fechaparseadas = DateTime.parse(pedidosget[i].fecha.toString());
-                        if (pedidosget[i].estado == 'pendiente') {
-                            if (pedidosget[i].tipo == 'normal') {
-                                if (fechaparseadas.year == now.year &&
-                                    fechaparseadas.month == now.month &&
-                                    fechaparseadas.day == now.day) {
-                                    if (fechaparseadas.hour < 16) {
-                                        latitudtemp = (pedidosget[i].latitud ?? 0.0) + (0.000001 * count);
-                                        longitudtemp = (pedidosget[i].longitud ?? 0.0) + (0.000001 * count);
-                                        LatLng tempcoord = LatLng(latitudtemp, longitudtemp);
+      if (res.statusCode == 200) {
+        var data = json.decode(res.body);
+        List<Pedido> tempPedido = (data as List).map<Pedido>((data) {
+          return Pedido(
+              id: data['id'],
+              ruta_id: data['ruta_id'] ?? 0,
+              subtotal: data['subtotal']?.toDouble() ?? 0.0,
+              descuento: data['descuento']?.toDouble() ?? 0.0,
+              total: data['total']?.toDouble() ?? 0.0,
+              fecha: data['fecha'],
+              tipo: data['tipo'],
+              estado: data['estado'],
+              latitud: data['latitud']?.toDouble() ?? 0.0,
+              longitud: data['longitud']?.toDouble() ?? 0.0,
+              nombre: data['nombre'] ?? '',
+              apellidos: data['apellidos'] ?? '',
+              telefono: data['telefono'] ?? '');
+        }).toList();
 
-                                        puntosnormal.add(tempcoord);
+        if (mounted) {
+          setState(() {
+            pedidosget = tempPedido;
+            int count = 1;
+            for (var i = 0; i < pedidosget.length; i++) {
+              fechaparseadas = DateTime.parse(pedidosget[i].fecha.toString());
+              if (pedidosget[i].estado == 'pendiente') {
+                if (pedidosget[i].tipo == 'normal') {
+                  if (fechaparseadas.year == now.year &&
+                      fechaparseadas.month == now.month &&
+                      fechaparseadas.day == now.day) {
+                    if (fechaparseadas.hour < 16) {
+                      latitudtemp =
+                          (pedidosget[i].latitud ?? 0.0) + (0.000001 * count);
+                      longitudtemp =
+                          (pedidosget[i].longitud ?? 0.0) + (0.000001 * count);
+                      LatLng tempcoord = LatLng(latitudtemp, longitudtemp);
 
-                                        pedidosget[i].latitud = latitudtemp;
-                                        pedidosget[i].longitud = longitudtemp;
-                                        hoypedidos.add(pedidosget[i]);
-                                    }
-                                }
-                            } else if (pedidosget[i].tipo == 'express') {
-                                latitudtemp = (pedidosget[i].latitud ?? 0.0) + (0.000001 * count);
-                                longitudtemp = (pedidosget[i].longitud ?? 0.0) + (0.000001 * count);
-                                LatLng tempcoordexpress = LatLng(latitudtemp, longitudtemp);
+                      puntosnormal.add(tempcoord);
 
-                                puntosexpress.add(tempcoordexpress);
-
-                                pedidosget[i].latitud = latitudtemp;
-                                pedidosget[i].longitud = longitudtemp;
-                                hoyexpress.add(pedidosget[i]);
-                            }
-                        }
-                        count++;
+                      pedidosget[i].latitud = latitudtemp;
+                      pedidosget[i].longitud = longitudtemp;
+                      hoypedidos.add(pedidosget[i]);
                     }
+                  }
+                } else if (pedidosget[i].tipo == 'express') {
+                  if (fechaparseadas.year == now.year &&
+                      fechaparseadas.month == now.month &&
+                      fechaparseadas.day == now.day) {
+                    latitudtemp =
+                        (pedidosget[i].latitud ?? 0.0) + (0.000001 * count);
+                    longitudtemp =
+                        (pedidosget[i].longitud ?? 0.0) + (0.000001 * count);
+                    LatLng tempcoordexpress = LatLng(latitudtemp, longitudtemp);
 
-                    marcadoresPut("normal");
-                    marcadoresPut("express");
-                    print("PUNTOS GET");
-                    print(puntosget);
-                });
+                    puntosexpress.add(tempcoordexpress);
+
+                    pedidosget[i].latitud = latitudtemp;
+                    pedidosget[i].longitud = longitudtemp;
+                    hoyexpress.add(pedidosget[i]);
+                  }
+                }
+              }
+              count++;
             }
-        }
-    } catch (e) {
-        throw Exception('Error $e');
-    }
-}
 
+            marcadoresPut("normal");
+            marcadoresPut("express");
+            print("PUNTOS GET");
+            print(puntosget);
+          });
+        }
+      }
+    } catch (e) {
+      throw Exception('Error $e');
+    }
+  }
 
   void connectToServer() {
     print("-----CONEXIÓN------");
@@ -414,20 +418,24 @@ Future<dynamic> getPedidos() async {
               agendados.add(nuevoPedido);
             }*/
           } else if (nuevoPedido.tipo == 'express') {
-            print(nuevoPedido);
+            if (fechaparseada.year == now.year &&
+                fechaparseada.month == now.month &&
+                fechaparseada.day == now.day) {
+              print(nuevoPedido);
 
-            hoyexpress.add(nuevoPedido);
+              hoyexpress.add(nuevoPedido);
 
-            // OBTENER COORDENADAS DE LOS EXPRESS
-            LatLng tempcoordexpress =
-                LatLng(nuevoPedido.latitud ?? 0.0, nuevoPedido.longitud ?? 0.0);
-            setState(() {
-              puntosexpress.add(tempcoordexpress);
-            });
-            marcadoresPut("express");
-            setState(() {
-              // ACTUALIZAMOS LA VISTA
-            });
+              // OBTENER COORDENADAS DE LOS EXPRESS
+              LatLng tempcoordexpress = LatLng(
+                  nuevoPedido.latitud ?? 0.0, nuevoPedido.longitud ?? 0.0);
+              setState(() {
+                puntosexpress.add(tempcoordexpress);
+              });
+              marcadoresPut("express");
+              setState(() {
+                // ACTUALIZAMOS LA VISTA
+              });
+            }
           }
         }
         // SI EL PEDIDO TIENE FECHA DE HOY Y ES NORMAL
@@ -498,14 +506,14 @@ Future<dynamic> getPedidos() async {
   }*/
     });
   }
-  
+
   @override
   void dispose() {
     _scrollController2.dispose();
     _scrollController3.dispose();
     super.dispose();
   }
-  
+
   @override
   void initState() {
     super.initState();
@@ -539,7 +547,7 @@ Future<dynamic> getPedidos() async {
                 return Row(
                   children: [
                     Container(
-                      height: 100,
+                      height: 150,
                       width: 150,
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -565,7 +573,8 @@ Future<dynamic> getPedidos() async {
                           Text(
                             "Total: ${hoypedidos[index].total}",
                             style: TextStyle(color: Colors.white),
-                          )
+                          ),
+                          Text("Fecha: ${hoypedidos[index].fecha}")
                         ],
                       ),
                     ),
@@ -694,7 +703,7 @@ Future<dynamic> getPedidos() async {
                 return Row(
                   children: [
                     Container(
-                      height: 100,
+                      height: 150,
                       width: 150,
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -720,7 +729,8 @@ Future<dynamic> getPedidos() async {
                           Text(
                             "Total: ${hoyexpress[index].total}",
                             style: TextStyle(color: Colors.white),
-                          )
+                          ),
+                          Text("Fechas: ${hoyexpress[index].fecha}")
                         ],
                       ),
                     ),
