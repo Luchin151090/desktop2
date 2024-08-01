@@ -95,7 +95,7 @@ class _AgendadosState extends State<Agendados> {
 
   Future<dynamic> getPedidos() async {
     try {
-      print("---------dentro ..........................get pdeidos");
+      print("---------dentro ..........................get pedidos");
       print(apipedidos);
       SharedPreferences empleadoShare = await SharedPreferences.getInstance();
 
@@ -123,22 +123,21 @@ class _AgendadosState extends State<Agendados> {
               telefono: data['telefono'] ?? '');
         }).toList();
 
+        if (!mounted) return;
+
         setState(() {
           pedidosget = tempPedido;
           print("---pedidos get");
           print(pedidosget.length);
 
           // TRAIGO LOS DISTRITOS DE LOS PEDIDOS DE AYER - SOLO LOS DE AYER
-
           for (var j = 0; j < pedidosget.length; j++) {
             fechaparseadas = DateTime.parse(pedidosget[j].fecha.toString());
             if (pedidosget[j].estado == 'pendiente') {
               if (pedidosget[j].tipo == 'normal' ||
                   pedidosget[j].tipo == 'express') {
                 if (fechaparseadas.day != now.day) {
-                  setState(() {
-                    distritosSet.add(pedidosget[j].distrito.toString());
-                  });
+                  distritosSet.add(pedidosget[j].distrito.toString());
                 }
               }
             }
@@ -151,7 +150,7 @@ class _AgendadosState extends State<Agendados> {
           print("distritos");
           print(distrito_de_pedido);
 
-          // AHORA ITERO  EN TODOS LOS PEDIDOS Y LO RELACIONO SOLO CON LOS DISTRTOS QUE OBTUVE
+          // AHORA ITERO EN TODOS LOS PEDIDOS Y LO RELACIONO SOLO CON LOS DISTRITOS QUE OBTUVE
           for (var x = 0; x < distrito_de_pedido.length; x++) {
             print(distrito_de_pedido[x]);
             for (var j = 0; j < pedidosget.length; j++) {
@@ -176,68 +175,60 @@ class _AgendadosState extends State<Agendados> {
                 }
               }
             }
-            //SALGO DEL 2DO FOR, PORQUE YA AÑADI SOLO LOS PEDIDOS DE UN DISTRITO EN ESPECIFICO
+            // SALGO DEL 2DO FOR, PORQUE YA AÑADI SOLO LOS PEDIDOS DE UN DISTRITO EN ESPECIFICO
             // FINALMENTE ESA SERIA LA CLAVE Y EL CONJUNTO DE PEDIDOS DE ESE DISTRITO
-            setState(() {
-              distrito_pedido['${distrito_de_pedido[x]}'] = nuevopedidodistrito;
-              nuevopedidodistrito =
-                  []; // SI YA TERMINE DE AÑADIR AL MAP, AHORA SOLO LIMPIO
-            });
-            print("tamaño de mapa");
-            print(distrito_pedido['${distrito_de_pedido[x]}']?.length);
+            if (mounted) {
+              setState(() {
+                distrito_pedido['${distrito_de_pedido[x]}'] =
+                    nuevopedidodistrito;
+                nuevopedidodistrito =
+                    []; // SI YA TERMINE DE AÑADIR AL MAP, AHORA SOLO LIMPIO
+              });
+              print("tamaño de mapa");
+              print(distrito_pedido['${distrito_de_pedido[x]}']?.length);
+            }
           }
 
           int count = 1;
           for (var i = 0; i < pedidosget.length; i++) {
             fechaparseadas = DateTime.parse(pedidosget[i].fecha.toString());
             if (pedidosget[i].estado == 'pendiente') {
-              // print("pendi...");
               if (pedidosget[i].tipo == 'normal' ||
                   pedidosget[i].tipo == 'express') {
-                // print("normlllll");
-                // SI ES NORMAL
                 if (fechaparseadas.day != now.day) {
-                  // print("no es hoy");
-                  // print(fechaparseadas.day);
+                  if (mounted) {
+                    setState(() {
+                      LatLng coordGET = LatLng(
+                          (pedidosget[i].latitud ?? 0.0) + (0.000001 * count),
+                          (pedidosget[i].longitud ?? 0.0) + (0.000001 * count));
 
-                  setState(() {
-                    LatLng coordGET = LatLng(
-                        (pedidosget[i].latitud ?? 0.0) + (0.000001 * count),
-                        (pedidosget[i].longitud ?? 0.0) + (0.000001 * count));
+                      puntosget.add(coordGET);
+                      pedidosget[i].latitud = coordGET.latitude;
+                      pedidosget[i].longitud = coordGET.longitude;
 
-                    puntosget.add(coordGET);
-                    pedidosget[i].latitud = coordGET.latitude;
-                    pedidosget[i].longitud = coordGET.longitude;
-
-                    // print("--get posss");
-                    // print(coordGET);
-                    agendados.add(pedidosget[i]);
-                    print("......AGENDADOS");
-                    print(agendados);
-                  });
+                      agendados.add(pedidosget[i]);
+                      print("......AGENDADOS");
+                      print(agendados);
+                    });
+                  }
                 }
               }
             } else {
-              setState(() {});
+              if (mounted) {
+                setState(() {});
+              }
             }
             count++;
           }
         });
 
-        // OBTENER COORDENADAS DE LOS PEDIDOS
-        // for (var i = 0; i < pedidosget.length; i++) {}
-        //print("PUNTOS GET");
-        //print(puntosget);
-
-        // PONER MARCADOR PARA AGENDADOS
-        marcadoresPut("agendados");
-        setState(() {});
-
-        setState(() {
+        if (mounted) {
+          marcadoresPut("agendados");
+          setState(() {});
           number = agendados.length;
-        });
-        print("ageng tama");
-        print(number);
+          print("ageng tama");
+          print(number);
+        }
       }
     } catch (e) {
       throw Exception('Error $e');
@@ -360,9 +351,9 @@ class _AgendadosState extends State<Agendados> {
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  //color:const Color.fromARGB(255, 231, 231, 231)
-                  ),
+                borderRadius: BorderRadius.circular(10),
+                //color:const Color.fromARGB(255, 231, 231, 231)
+              ),
               width: MediaQuery.of(context).size.width / 8,
               height: MediaQuery.of(context).size.height / 1.1,
               child: number > 0
@@ -376,31 +367,37 @@ class _AgendadosState extends State<Agendados> {
                           margin: EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                           color: Color.fromARGB(255, 174, 151, 179).withOpacity(0.82),
+                            color: Color.fromARGB(255, 174, 151, 179)
+                                .withOpacity(0.82),
                           ),
-                          
-                          child:  Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Center(
-                                    child: Text(
-                                  'Pedido N: ${agendados[index].id} ',
-                                  style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
-                                )),
-                                Text("Estado: ${agendados[index].estado}",style: TextStyle(
-                                  color: Color.fromARGB(255, 255, 229, 183)
-                                ),),
-                                Text("Fecha: ${agendados[index].fecha}",style: TextStyle(
-                                  color: Color.fromARGB(255, 200, 169, 201),fontWeight: FontWeight.bold
-                                ),),
-                                Text("Total:S/.${agendados[index].total}"),
-                                Text("Nombres: ${agendados[index].nombre}"),
-                                Text("Apellidos: ${agendados[index].apellidos}"),
-                                Text("Distrito:${agendados[index].distrito}")
-                              ],
-                            ),
-                          
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Center(
+                                  child: Text(
+                                'Pedido N: ${agendados[index].id} ',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              )),
+                              Text(
+                                "Estado: ${agendados[index].estado}",
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 255, 229, 183)),
+                              ),
+                              Text(
+                                "Fecha: ${agendados[index].fecha}",
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 200, 169, 201),
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text("Total:S/.${agendados[index].total}"),
+                              Text("Nombres: ${agendados[index].nombre}"),
+                              Text("Apellidos: ${agendados[index].apellidos}"),
+                              Text("Distrito:${agendados[index].distrito}")
+                            ],
+                          ),
                         );
                       })
                   : Container(
