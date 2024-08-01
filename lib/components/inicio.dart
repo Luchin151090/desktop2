@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 class Menu extends StatefulWidget {
-  const Menu({Key? key}) : super(key: key);
+  const Menu({super.key});
 
   @override
   State<Menu> createState() => _MenuState();
@@ -24,7 +24,7 @@ class _MenuState extends State<Menu> {
           children: [
             Container(
               width: 80,
-              color: Color.fromARGB(255, 231, 211, 211),
+              color: const Color.fromARGB(255, 231, 211, 211),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -45,11 +45,11 @@ class _MenuState extends State<Menu> {
                             builder: (BuildContext context) {
                               return Dialog(
                                 backgroundColor: Colors.white,
-                                surfaceTintColor: Colors.amber,
+                                surfaceTintColor:const Color.fromARGB(255, 160, 148, 190),
                                 child: Container(
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20)),
-                                  padding: EdgeInsets.all(15),
+                                  padding: const EdgeInsets.all(15),
                                   height:
                                       MediaQuery.of(context).size.height / 3,
                                   width: MediaQuery.of(context).size.width / 4,
@@ -57,18 +57,18 @@ class _MenuState extends State<Menu> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Center(
+                                      const Center(
                                           child: Text("Información Personal")),
                                       const SizedBox(
                                         height: 50,
                                       ),
-                                      Column(
+                                     const Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text("Pato del Carpio"),
+                                          Text("Nombres: xxx-xxx"),
                                           Text("Código empleado: XDFG"),
                                           Text("Zona Trabajo: Arequipa")
                                         ],
@@ -81,7 +81,7 @@ class _MenuState extends State<Menu> {
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            child: Text("Cerrar")),
+                                            child:const Text("Cerrar")),
                                       )
                                     ],
                                   ),
@@ -90,7 +90,7 @@ class _MenuState extends State<Menu> {
                             });
                       },
                       icon:
-                          Icon(Icons.person_outline_sharp, color: Colors.black),
+                          const Icon(Icons.person_outline_sharp, color: Colors.black),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -103,10 +103,10 @@ class _MenuState extends State<Menu> {
                     child: IconButton(
                       onPressed: () {
                         _navigatorKey.currentState?.pushReplacement(
-                          CupertinoPageRoute(builder: (context) => Ruteo()),
+                          CupertinoPageRoute(builder: (context) => const Ruteo()),
                         );
                       },
-                      icon: Icon(Icons.drive_eta_outlined),
+                      icon:const Icon(Icons.drive_eta_outlined),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -119,10 +119,10 @@ class _MenuState extends State<Menu> {
                     child: IconButton(
                       onPressed: () {
                         _navigatorKey.currentState?.pushReplacement(
-                          CupertinoPageRoute(builder: (context) => Tienda()),
+                          CupertinoPageRoute(builder: (context) => const Tienda()),
                         );
                       },
-                      icon: Icon(Icons.storefront_outlined),
+                      icon:const Icon(Icons.storefront_outlined),
                     ),
                   ),
                   // SALIR
@@ -140,10 +140,10 @@ class _MenuState extends State<Menu> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Login()),
+                                    builder: (context) => const Login1()),
                               );
                             },
-                            icon: Icon(Icons.exit_to_app)),
+                            icon:const Icon(Icons.exit_to_app)),
                       ),
                       const SizedBox(
                         height: 30,
@@ -158,7 +158,7 @@ class _MenuState extends State<Menu> {
                 key: _navigatorKey,
                 onGenerateRoute: (routeSettings) {
                   return CupertinoPageRoute(
-                    builder: (context) => Ruteo(),
+                    builder: (context) => const Ruteo(),
                   );
                 },
               ),

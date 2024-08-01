@@ -1,10 +1,10 @@
+//import 'package:desktop2/components/crud.dart';
 import 'package:desktop2/components/crud.dart';
 import 'package:desktop2/components/model/user_model.dart';
-import 'package:desktop2/components/probando.dart';
+import 'package:desktop2/components/inicio.dart';
 import 'package:desktop2/components/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'dart:convert';
@@ -56,8 +56,8 @@ class _Login1State extends State<Login1> {
 
           //  print("STATUS");
           //  print(status);
-          //print("ROL");
-          //print(rol);
+          print("ROL");
+          print(rol);
         }
         //ADMINISTRADOR
         else if (data['usuario']['rol_id'] == 1) {
@@ -71,8 +71,8 @@ class _Login1State extends State<Login1> {
           });
           //print("STATUS");
           //print(status);
-          //print("ROL");
-          //print(rol);
+          print("ROL");
+          print(rol);
         }
 
         /// SETEAMOS EL PROVIDER CON UN USUARIO
@@ -85,8 +85,8 @@ class _Login1State extends State<Login1> {
         });
         //print("STATUS");
         //print(status);
-        //print("ROL");
-        //print(rol);
+        print("ROL");
+        print(rol);
       } else if (res.statusCode == 404) {
         //var data = json.decode(res.body);
 
@@ -97,8 +97,8 @@ class _Login1State extends State<Login1> {
         });
         //print("STATUS");
         //print(status);
-        //print("ROL");
-        //print(rol);
+        print("ROL");
+        print(rol);
       }
     } catch (e) {
       throw Exception('$e');
@@ -108,17 +108,20 @@ class _Login1State extends State<Login1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-            child: Row(
+        body: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          flex: 2,
+        Container(
+          width: MediaQuery.of(context).size.width / 2,
+          height: MediaQuery.of(context).size.height,
+          color: Color.fromARGB(255, 222, 223, 230),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            //crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                margin: const EdgeInsets.only(left: 380, top: 100),
+                //margin: const EdgeInsets.only(left: 380, top: 100),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -132,6 +135,9 @@ class _Login1State extends State<Login1> {
                   ),
                 ),
               ),
+              const SizedBox(
+                height: 20,
+              ),
               Container(
                 padding: const EdgeInsets.all(30),
                 decoration: BoxDecoration(
@@ -139,13 +145,16 @@ class _Login1State extends State<Login1> {
                   color: Colors.white,
                 ),
                 width: MediaQuery.of(context).size.width / 5,
-                margin: const EdgeInsets.only(left: 320, top: 20),
+                //margin: const EdgeInsets.only(left: 320, top: 20),
                 child: TextField(
                   controller: _usuario,
                   decoration: const InputDecoration(
                     hintText: 'Usuario',
                   ),
                 ),
+              ),
+              const SizedBox(
+                height: 20,
               ),
               Container(
                 padding: const EdgeInsets.all(30),
@@ -154,7 +163,7 @@ class _Login1State extends State<Login1> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 width: MediaQuery.of(context).size.width / 5,
-                margin: const EdgeInsets.only(left: 320, top: 20),
+                //margin: const EdgeInsets.only(left: 320, top: 20),
                 child: TextField(
                   controller: _contrasena,
                   obscureText: true,
@@ -163,8 +172,11 @@ class _Login1State extends State<Login1> {
                   ),
                 ),
               ),
+              const SizedBox(
+                height: 20,
+              ),
               Container(
-                margin: const EdgeInsets.only(left: 400, top: 20),
+                // margin: const EdgeInsets.only(left: 400, top: 20),
                 child: TextButton(
                   onPressed: () {},
                   child: const Text(
@@ -173,8 +185,11 @@ class _Login1State extends State<Login1> {
                   ),
                 ),
               ),
+              const SizedBox(
+                height: 20,
+              ),
               Container(
-                margin: const EdgeInsets.only(left: 320, top: 20),
+                // margin: const EdgeInsets.only(left: 320, top: 20),
                 padding: const EdgeInsets.all(8),
                 height: 60,
                 width: MediaQuery.of(context).size.width / 5,
@@ -269,12 +284,15 @@ class _Login1State extends State<Login1> {
                   ),
                 ),
               ),
+              const SizedBox(
+                height: 20,
+              ),
               Container(
-                margin: const EdgeInsets.only(left: 420, top: 20),
+                //margin: const EdgeInsets.only(left: 420, top: 20),
                 child: Text(
                   "COTECSA ${tiempo.year}",
-                  style: TextStyle(
-                    color: Colors.black,
+                  style: const TextStyle(
+                    color: Color.fromARGB(255, 63, 63, 67),
                     fontSize: 25,
                     fontWeight: FontWeight.w500,
                   ),
@@ -287,13 +305,32 @@ class _Login1State extends State<Login1> {
           width: MediaQuery.of(context).size.width / 2,
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('lib/imagenes/pareja_tomando_agua.png'),
-                  fit: BoxFit.contain)),
+
+            color: const Color.fromARGB(255, 211, 191, 214)
+          ),
+          //color: Colors.green,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width / 3,
+                height: MediaQuery.of(context).size.height / 1.2,
+                
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('lib/imagenes/aguadibujo.jpg'),
+                    fit: BoxFit.fill
+                  ),
+                  color: Colors.amber,
+                  borderRadius: BorderRadius.circular(20)
+                ),
+              ),
+            ],
+          ),
 
           //color: Colors.grey,
         )
       ],
-    )));
+    ));
   }
 }

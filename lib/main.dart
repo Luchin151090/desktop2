@@ -1,20 +1,29 @@
 import 'package:desktop2/components/login.dart';
-import 'package:desktop2/components/probando.dart';
+import 'package:desktop2/components/inicio.dart';
 import 'package:desktop2/components/provider/marcador.dart';
+import 'package:desktop2/components/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
+
 import 'package:provider/provider.dart';
-Future main() async{
+
+
+void main() async {
   await dotenv.load(fileName: '.env');
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => MarcadorProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => MarcadorProvider()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        // Agrega más proveedores según sea necesario
+      ],
       child: const MyApp(),
     ),
   );
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -23,13 +32,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
        
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        
         useMaterial3: true,
       ),
-      home: Login()
+      home: Login1()
     );
   }
 }
