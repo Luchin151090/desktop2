@@ -1,4 +1,5 @@
 import 'package:desktop2/components/distritos/distritos.dart';
+import 'package:desktop2/components/provider/marcador.dart';
 import 'package:desktop2/components/ruteowidgets/agendados.dart';
 import 'package:desktop2/components/ruteowidgets/rutas.dart';
 import 'package:desktop2/components/ruteowidgets/tiemporeal.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -289,9 +291,11 @@ class _RuteoState extends State<Ruteo> {
               dni: data['dni'],
               fecha_nacimiento: data['fecha_nacimiento']);
         }).toList();
-        setState(() {
-          conductorget = tempConductor;
-        });
+        if (mounted) {
+          setState(() {
+            conductorget = tempConductor;
+          });
+        }
       }
     } catch (e) {
       throw Exception('$e');
@@ -322,9 +326,11 @@ class _RuteoState extends State<Ruteo> {
             administrador_id: item['administrador_id'],
           );
         }).toList();
-        setState(() {
-          vehiculos = tempVehiculo;
-        });
+        if (mounted) {
+          setState(() {
+            vehiculos = tempVehiculo;
+          });
+        }
       }
     } catch (e) {
       throw Exception("$e");
@@ -332,6 +338,131 @@ class _RuteoState extends State<Ruteo> {
   }
 
   Future<dynamic> getPedidos() async {
+    try {
+      print("---------dentro ..........................get pedidos");
+      print(apipedidos);
+      SharedPreferences empleadoShare = await SharedPreferences.getInstance();
+
+      var empleadoIDs = 1; //empleadoShare.getInt('empleadoID');
+      var res = await http.get(
+          Uri.parse(api + apipedidos + '/' + empleadoIDs.toString()),
+          headers: {"Content-type": "application/json"});
+
+      if (res.statusCode == 200) {
+        var data = json.decode(res.body);
+        List<Pedido> tempPedido = (data as List).map<Pedido>((data) {
+          return Pedido(
+              id: data['id'],
+              ruta_id: data['ruta_id'] ?? 0,
+              subtotal: data['subtotal']?.toDouble() ?? 0.0,
+              descuento: data['descuento']?.toDouble() ?? 0.0,
+              total: data['total']?.toDouble() ?? 0.0,
+              fecha: data['fecha'],
+              tipo: data['tipo'],
+              distrito: data['distrito'],
+              estado: data['estado'],
+              latitud: data['latitud']?.toDouble() ?? 0.0,
+              longitud: data['longitud']?.toDouble() ?? 0.0,
+              nombre: data['nombre'] ?? '',
+              apellidos: data['apellidos'] ?? '',
+              telefono: data['telefono'] ?? '');
+        }).toList();
+
+        if (mounted) {
+          setState(() {
+            pedidosget = tempPedido;
+            print("---pedidos get");
+            print(pedidosget.length);
+
+            // TRAIGO LOS DISTRITOS DE LOS PEDIDOS DE AYER - SOLO LOS DE AYER
+            for (var j = 0; j < pedidosget.length; j++) {
+              fechaparseadas = DateTime.parse(pedidosget[j].fecha.toString());
+              if (pedidosget[j].estado == 'pendiente') {
+                if (pedidosget[j].tipo == 'normal' ||
+                    pedidosget[j].tipo == 'express') {
+                  if (fechaparseadas.day != now.day) {
+                    distritosSet.add(pedidosget[j].distrito.toString());
+                  }
+                }
+              }
+            }
+
+            // Convertir el Set a una lista
+            distrito_de_pedido = distritosSet.toList();
+            print("distritos");
+            print(distrito_de_pedido);
+
+            // AHORA ITERO EN TODOS LOS PEDIDOS Y LO RELACIONO SOLO CON LOS DISTRITOS QUE OBTUVE
+            for (var x = 0; x < distrito_de_pedido.length; x++) {
+              print(distrito_de_pedido[x]);
+              for (var j = 0; j < pedidosget.length; j++) {
+                fechaparseadas = DateTime.parse(pedidosget[j].fecha.toString());
+                if (pedidosget[j].estado == 'pendiente') {
+                  if (pedidosget[j].tipo == 'normal' ||
+                      pedidosget[j].tipo == 'express') {
+                    print("----------TIPO");
+                    print(pedidosget[j].tipo);
+                    if (fechaparseadas.day != now.day) {
+                      if (distrito_de_pedido[x] == pedidosget[j].distrito) {
+                        nuevopedidodistrito.add(pedidosget[j]);
+                        print("nuevo pedido distrito ID:");
+                        print(pedidosget[j].id);
+                        print(pedidosget[j].distrito);
+                        print(pedidosget[j].nombre);
+                        print(pedidosget[j].apellidos);
+                        print(pedidosget[j].tipo);
+                        print(pedidosget[j].total);
+                      }
+                    }
+                  }
+                }
+              }
+              setState(() {
+                distrito_pedido['${distrito_de_pedido[x]}'] =
+                    nuevopedidodistrito;
+                nuevopedidodistrito = [];
+              });
+              print("tamaño de mapa");
+              print(distrito_pedido['${distrito_de_pedido[x]}']?.length);
+            }
+
+            int count = 1;
+            for (var i = 0; i < pedidosget.length; i++) {
+              fechaparseadas = DateTime.parse(pedidosget[i].fecha.toString());
+              if (pedidosget[i].estado == 'pendiente') {
+                if (pedidosget[i].tipo == 'normal' ||
+                    pedidosget[i].tipo == 'express') {
+                  if (fechaparseadas.day != now.day) {
+                    LatLng coordGET = LatLng(
+                        (pedidosget[i].latitud ?? 0.0) + (0.000001 * count),
+                        (pedidosget[i].longitud ?? 0.0) + (0.000001 * count));
+                    puntosget.add(coordGET);
+                    pedidosget[i].latitud = coordGET.latitude;
+                    pedidosget[i].longitud = coordGET.longitude;
+                    agendados.add(pedidosget[i]);
+                    print("......AGENDADOS");
+                    print(agendados);
+                  }
+                }
+              }
+              count++;
+            }
+
+            marcadoresPut("agendados");
+            setState(() {
+              number = agendados.length;
+            });
+            print("ageng tama");
+            print(number);
+          });
+        }
+      }
+    } catch (e) {
+      throw Exception('Error $e');
+    }
+  }
+
+  /* Future<dynamic> getPedidos() async {
     try {
       print("---------dentro ..........................get pdeidos");
       print(apipedidos);
@@ -480,7 +611,7 @@ class _RuteoState extends State<Ruteo> {
     } catch (e) {
       throw Exception('Error $e');
     }
-  }
+  }*/
 
   void marcadoresPut(tipo) {
     setState(() {});
@@ -593,6 +724,7 @@ class _RuteoState extends State<Ruteo> {
 
   @override
   Widget build(BuildContext context) {
+    final marcadorProvider = Provider.of<MarcadorProvider>(context);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 91, 89, 107).withOpacity(0.95),
       body: Container(
@@ -622,8 +754,13 @@ class _RuteoState extends State<Ruteo> {
               //MAPA
               Column(
                 children: [
-                  Text("Mapa de pedidos",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,
-                  fontSize: MediaQuery.of(context).size.height/35),),
+                  Text(
+                    "Mapa de pedidos",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: MediaQuery.of(context).size.height / 35),
+                  ),
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -647,6 +784,9 @@ class _RuteoState extends State<Ruteo> {
                             MarkerLayer(
                               markers: [
                                 ...marcadores,
+                                ...marcadorProvider.marcadoresHoyE,
+                                ...marcadorProvider.marcadoresHoyN
+
                                 //...expressmarker,
                                 // ...normalmarker,
                               ],

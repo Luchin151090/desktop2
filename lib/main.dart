@@ -1,12 +1,19 @@
 import 'package:desktop2/components/login.dart';
 import 'package:desktop2/components/probando.dart';
+import 'package:desktop2/components/provider/marcador.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-Future main()async {
-  await dotenv.load(fileName: '.env');
-  runApp(const MyApp());
 
+import 'package:provider/provider.dart';
+Future main() async{
+  await dotenv.load(fileName: '.env');
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => MarcadorProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
