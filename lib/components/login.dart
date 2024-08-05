@@ -5,6 +5,7 @@ import 'package:desktop2/components/inicio.dart';
 import 'package:desktop2/components/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'dart:convert';
@@ -27,6 +28,7 @@ class _Login1State extends State<Login1> {
   late int status = 0;
   late int rol = 0;
   DateTime tiempo = DateTime.now();
+  bool _obscureText1 = true;
 
   Future<dynamic> loginsol(username, password) async {
     try {
@@ -115,7 +117,7 @@ class _Login1State extends State<Login1> {
         Container(
           width: MediaQuery.of(context).size.width / 2,
           height: MediaQuery.of(context).size.height,
-          color: Color.fromARGB(255, 222, 223, 230),
+          color: Color.fromARGB(255, 233, 233, 233),
           child: Column(
             //crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -166,8 +168,22 @@ class _Login1State extends State<Login1> {
                 //margin: const EdgeInsets.only(left: 320, top: 20),
                 child: TextField(
                   controller: _contrasena,
-                  obscureText: true,
-                  decoration: const InputDecoration(
+                  obscureText: _obscureText1,
+                  decoration:  InputDecoration(
+                    suffixIcon: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _obscureText1 = !_obscureText1;
+                                    });
+                                  },
+                                  child: Icon(
+                                    _obscureText1
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off,
+                                    color: Colors.grey,
+                                    size: 18,
+                                  ),
+                                ),
                     hintText: 'Contraseña',
                   ),
                 ),
@@ -306,7 +322,7 @@ class _Login1State extends State<Login1> {
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
 
-            color: const Color.fromARGB(255, 211, 191, 214)
+            color: Color.fromARGB(255, 237, 209, 167)
           ),
           //color: Colors.green,
           child: Column(

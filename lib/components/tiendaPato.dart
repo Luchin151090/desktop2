@@ -1,4 +1,4 @@
-import 'package:desktop2/components/login.dart';
+/*import 'package:desktop2/components/login.dart';
 import 'package:desktop2/components/probando.dart';
 import 'package:desktop2/components/provider/user_provider.dart';
 import 'dart:convert';
@@ -2272,3 +2272,4 @@ class _InicioState extends State<Inicio> {
     );
   }
 }
+*/

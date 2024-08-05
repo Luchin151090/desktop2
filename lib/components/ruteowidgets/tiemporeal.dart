@@ -1,6 +1,7 @@
 import 'package:desktop2/components/provider/marcador.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -9,6 +10,22 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:convert';
 import 'package:socket_io_client/socket_io_client.dart' as io;
+
+class Ruta {
+  final int id;
+  final int conductorid;
+  final int vehiculoid;
+  final int empleadoid;
+  final int distanciakm;
+  final int tiemporuta;
+  Ruta(
+      {required this.id,
+      required this.conductorid,
+      required this.vehiculoid,
+      required this.empleadoid,
+      required this.distanciakm,
+      required this.tiemporuta});
+}
 
 class Pedido {
   final int id;
@@ -77,8 +94,76 @@ class _TiemporealState extends State<Tiemporeal> {
   DateTime now = DateTime.now();
   String api = dotenv.env['API_URL'] ?? '';
   String apipedidos = '/api/pedido';
+  String apipedidoruta = '/api/pedidoruta/';
+  String allrutasempleado = '/api/allrutas_empleado/';
   double latitudtemp = 0.0;
   double longitudtemp = 0.0;
+  List<Ruta> rutasempleado = [];
+  int numeroruta = 0;
+  Ruta? selectedruta;
+  String mensajeruta = "NA";
+
+  Future<dynamic> updaterutapedido(int id, int ruta, String estado) async {
+    try {
+      var res = await http.put(Uri.parse(api + apipedidoruta + id.toString()),
+          headers: {"Content-type": "application/json"},
+          body: jsonEncode({"ruta_id": ruta, "estado": estado}));
+      if (res.statusCode == 200) {
+        if (mounted) {
+          setState(() {
+            mensajeruta = "Pedido en ruta";
+          });
+        }
+      }
+    } catch (error) {
+      throw Exception("Error en la actualización $error");
+    }
+  }
+
+  Future<dynamic> getallrutasempleado() async {
+    var empleado = 1;
+    try {
+      var res = await http.get(
+          Uri.parse(api + allrutasempleado + empleado.toString()),
+          headers: {"Content-type": "application/json"});
+
+      if (res.statusCode == 200) {
+        var responseData = json.decode(res.body);
+        print("rutass data");
+        print(responseData['data']);
+
+        // Asegúrate de que responseData['data'] sea una lista antes de usar map
+        if (responseData['data'] is List) {
+          List<Ruta> temprutasempleado =
+              (responseData['data'] as List).map<Ruta>((item) {
+            return Ruta(
+              id: item['id'],
+              conductorid: item['conductor_id'],
+              vehiculoid: item['vehiculo_id'],
+              empleadoid: item['empleado_id'],
+              distanciakm: item['distancia_km'],
+              tiemporuta: item['tiempo_ruta'],
+            );
+          }).toList();
+
+          if (mounted) {
+            setState(() {
+              rutasempleado = temprutasempleado;
+              numeroruta = rutasempleado.length;
+            });
+          }
+        } else {
+          print('No se encontraron rutas en la respuesta.');
+        }
+      } else if (res.statusCode == 404) {
+        print('No se encontraron rutas.');
+      } else {
+        print('Error inesperado: ${res.statusCode}');
+      }
+    } catch (error) {
+      throw Exception("Error de petición: $error");
+    }
+  }
 
   void marcadoresPut(tipo) {
     final marcadorProvider =
@@ -270,6 +355,7 @@ class _TiemporealState extends State<Tiemporeal> {
               estado: data['estado'],
               latitud: data['latitud']?.toDouble() ?? 0.0,
               longitud: data['longitud']?.toDouble() ?? 0.0,
+              distrito: data['distrito'],
               nombre: data['nombre'] ?? '',
               apellidos: data['apellidos'] ?? '',
               telefono: data['telefono'] ?? '');
@@ -519,6 +605,7 @@ class _TiemporealState extends State<Tiemporeal> {
     super.initState();
     connectToServer();
     getPedidos();
+    getallrutasempleado();
   }
 
   @override
@@ -531,319 +618,429 @@ class _TiemporealState extends State<Tiemporeal> {
           style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: MediaQuery.of(context).size.height / 35),
+              fontSize: MediaQuery.of(context).size.height / 45),
         ),
         Container(
           padding: EdgeInsets.all(8),
 
           //color: Colors.grey,
-          height: MediaQuery.of(context).size.height / 2.5,
+          height: MediaQuery.of(context).size.height / 2.35,
           width: 250,
           // margin: EdgeInsets.all(5),
-          child: ListView.builder(
-              controller: _scrollController2,
-              itemCount: hoypedidos.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Row(
-                  children: [
-                    Container(
-                      height: 150,
-                      width: 150,
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 134, 179, 160)
-                              .withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(20)),
-                      margin: const EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Pedido Normal :${hoypedidos[index].id}",
-                            style: TextStyle(color: Colors.white),
+          child: hoypedidos.length > 0
+              ? ListView.builder(
+                  controller: _scrollController2,
+                  itemCount: hoypedidos.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Row(
+                      children: [
+                        Container(
+                          height: 150,
+                          width: 150,
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 215, 239, 59),
+                              borderRadius: BorderRadius.circular(20)),
+                          margin: const EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Pedido Normal :${hoypedidos[index].id}",
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 40, 39, 39)),
+                              ),
+                              Text(
+                                "Nombres :${hoypedidos[index].nombre}",
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 67, 67, 67)),
+                              ),
+                              Text(
+                                "Distrito :${hoypedidos[index].distrito}",
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 56, 56, 56)),
+                              ),
+                              Text(
+                                "Total: ${hoypedidos[index].total}",
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 49, 49, 49)),
+                              ),
+                              Text("Fecha: ${hoypedidos[index].fecha}")
+                            ],
                           ),
-                          Text(
-                            "Nombres :${hoypedidos[index].nombre}",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            "Distrito :${hoypedidos[index].distrito}",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            "Total: ${hoypedidos[index].total}",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text("Fecha: ${hoypedidos[index].fecha}")
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 188, 168, 192),
-                          borderRadius: BorderRadius.circular(50)),
-                      child: IconButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Dialog(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      height:
-                                          MediaQuery.of(context).size.height /
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 215, 239, 59),
+                              borderRadius: BorderRadius.circular(50)),
+                          child: IconButton(
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Dialog(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(20)),
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
                                               5.5,
-                                      width:
-                                          MediaQuery.of(context).size.width / 6,
-                                      padding: const EdgeInsets.all(11),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Center(
-                                              child: const Text(
-                                            "Ruta",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          )),
-                                          StatefulBuilder(builder:
-                                              (BuildContext context,
-                                                  StateSetter setState) {
-                                            return Text("no");
-                                            /* return DropdownButton(
-                                                                        hint: const Text(
-                                                                            'Vehículos'),
-                                                                        value:
-                                                                            selectedVehiculo,
-                                                                        items: vehiculos.map((Vehiculo
-                                                                            auto) {
-                                                                          return DropdownMenuItem<
-                                                                              Vehiculo>(
-                                                                            value:
-                                                                                auto,
-                                                                            child:
-                                                                                Text("${auto.nombre_modelo}"),
-                                                                          );
-                                                                        }).toList(),
-                                                                        onChanged:
-                                                                            (Vehiculo?
-                                                                                newValue) {
-                                                                          setState(
-                                                                              () {
-                                                                            selectedVehiculo =
-                                                                                newValue;
-                                                                          });
-                                                                        },
-                                                                      );*/
-                                          }),
-                                          Center(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text("Cancelar")),
-                                                ElevatedButton(
-                                                    onPressed: () {},
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                            WidgetStateProperty
-                                                                .all(const Color
-                                                                    .fromARGB(
-                                                                    255,
-                                                                    129,
-                                                                    96,
-                                                                    135))),
-                                                    child: Text(
-                                                      "Confirmar",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ))
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                });
-                          },
-                          icon: const Icon(
-                            Icons.add,
-                            size: 25,
-                            color: const Color.fromARGB(255, 255, 230, 0),
-                          )),
-                    ),
-                  ],
-                );
-              }),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              6,
+                                          padding: const EdgeInsets.all(11),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              const Center(
+                                                  child: const Text(
+                                                "Actualizar a la ruta",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )),
+                                              StatefulBuilder(builder:
+                                                  (BuildContext context,
+                                                      StateSetter setState) {
+                                                //return Text("no");
+                                                return DropdownButton(
+                                                  hint: const Text('Ruta'),
+                                                  value: selectedruta,
+                                                  items: rutasempleado
+                                                      .map((Ruta rutita) {
+                                                    return DropdownMenuItem<
+                                                        Ruta>(
+                                                      value: rutita,
+                                                      child:
+                                                          Text("${rutita.id}"),
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (Ruta? newValue) {
+                                                    setState(() {
+                                                      selectedruta = newValue;
+                                                    });
+                                                  },
+                                                );
+                                              }),
+                                              Center(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child:
+                                                            Text("Cancelar")),
+                                                    ElevatedButton(
+                                                        onPressed: () async {
+                                                          showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return const AlertDialog(
+                                                                content: Row(
+                                                                  children: [
+                                                                    CircularProgressIndicator(
+                                                                      backgroundColor: Color.fromARGB(
+                                                                          255,
+                                                                          126,
+                                                                          218,
+                                                                          21),
+                                                                    ),
+                                                                    SizedBox(
+                                                                        width:
+                                                                            20),
+                                                                    Text(
+                                                                        "Cargando..."),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            },
+                                                          );
+                                                          print(
+                                                              "actualizando a la ruta");
+                                                          await updaterutapedido(
+                                                              hoypedidos[index]
+                                                                  .id,
+                                                              selectedruta!.id,
+                                                              "en proceso");
+                                                          Navigator.pop(
+                                                              context);
+                                                          Navigator.pop(
+                                                              context);
+                                                              setState(() {
+                                                                
+                                                              });
+                                                        },
+                                                        style: ButtonStyle(
+                                                            backgroundColor:
+                                                                WidgetStateProperty
+                                                                    .all(const Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            69,
+                                                                            57,
+                                                                            204))),
+                                                        child: const Text(
+                                                          "Confirmar",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        ))
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              },
+                              icon: const Icon(
+                                Icons.add,
+                                size: 25,
+                                color: Color.fromARGB(255, 53, 54, 80),
+                              )),
+                        ),
+                      ],
+                    );
+                  })
+              : Container(
+                  padding: const EdgeInsets.all(8),
+
+                  //color: Colors.grey,
+                  height: MediaQuery.of(context).size.height / 2.45,
+                  width: 250,
+                  decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 255, 255, 255)),
+                  child: const Center(
+                      child: Text(
+                    "No hay pedidos Normales",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )),
+                ),
         ),
         Container(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
 
           //color: Colors.grey,
-          height: MediaQuery.of(context).size.height / 2,
+          height: MediaQuery.of(context).size.height / 2.45,
           width: 250,
           // margin: EdgeInsets.all(5),
-          child: ListView.builder(
-              controller: _scrollController3,
-              itemCount: hoyexpress.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Row(
-                  children: [
-                    Container(
-                      height: 150,
-                      width: 150,
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 179, 134, 176)
-                              .withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(20)),
-                      margin: const EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Pedido Express :${hoyexpress[index].id}",
-                            style: TextStyle(color: Colors.white),
+          child: hoyexpress.length > 0
+              ? ListView.builder(
+                  controller: _scrollController3,
+                  itemCount: hoyexpress.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Row(
+                      children: [
+                        Container(
+                          height: 150,
+                          width: 150,
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 50, 89, 229)
+                                  .withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(20)),
+                          margin: const EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Pedido Express :${hoyexpress[index].id}",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Nombres :${hoyexpress[index].nombre}",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Distrito :${hoyexpress[index].distrito}",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Total: ${hoyexpress[index].total}",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text("Fechas: ${hoyexpress[index].fecha}")
+                            ],
                           ),
-                          Text(
-                            "Nombres :${hoyexpress[index].nombre}",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            "Distrito :${hoyexpress[index].distrito}",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            "Total: ${hoyexpress[index].total}",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text("Fechas: ${hoyexpress[index].fecha}")
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 188, 168, 192),
-                          borderRadius: BorderRadius.circular(50)),
-                      child: IconButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Dialog(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      height:
-                                          MediaQuery.of(context).size.height /
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 67, 79, 211),
+                              borderRadius: BorderRadius.circular(50)),
+                          child: IconButton(
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Dialog(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(20)),
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
                                               5.5,
-                                      width:
-                                          MediaQuery.of(context).size.width / 6,
-                                      padding: const EdgeInsets.all(11),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Center(
-                                              child: const Text(
-                                            "Ruta",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          )),
-                                          StatefulBuilder(builder:
-                                              (BuildContext context,
-                                                  StateSetter setState) {
-                                            return Text("no");
-                                            /* return DropdownButton(
-                                                                        hint: const Text(
-                                                                            'Vehículos'),
-                                                                        value:
-                                                                            selectedVehiculo,
-                                                                        items: vehiculos.map((Vehiculo
-                                                                            auto) {
-                                                                          return DropdownMenuItem<
-                                                                              Vehiculo>(
-                                                                            value:
-                                                                                auto,
-                                                                            child:
-                                                                                Text("${auto.nombre_modelo}"),
-                                                                          );
-                                                                        }).toList(),
-                                                                        onChanged:
-                                                                            (Vehiculo?
-                                                                                newValue) {
-                                                                          setState(
-                                                                              () {
-                                                                            selectedVehiculo =
-                                                                                newValue;
-                                                                          });
-                                                                        },
-                                                                      );*/
-                                          }),
-                                          Center(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text("Cancelar")),
-                                                ElevatedButton(
-                                                    onPressed: () {},
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                            WidgetStateProperty
-                                                                .all(const Color
-                                                                    .fromARGB(
-                                                                    255,
-                                                                    129,
-                                                                    96,
-                                                                    135))),
-                                                    child: Text(
-                                                      "Confirmar",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ))
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                });
-                          },
-                          icon: const Icon(
-                            Icons.add,
-                            size: 25,
-                            color: const Color.fromARGB(255, 255, 230, 0),
-                          )),
-                    ),
-                  ],
-                );
-              }),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              6,
+                                          padding: const EdgeInsets.all(11),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              const Center(
+                                                  child: const Text(
+                                                "Actualizar a la ruta",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )),
+                                              StatefulBuilder(builder:
+                                                  (BuildContext context,
+                                                      StateSetter setState) {
+                                                return DropdownButton(
+                                                  hint: const Text('Ruta'),
+                                                  value: selectedruta,
+                                                  items: rutasempleado
+                                                      .map((Ruta rutita) {
+                                                    return DropdownMenuItem<
+                                                        Ruta>(
+                                                      value: rutita,
+                                                      child:
+                                                          Text("${rutita.id}"),
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (Ruta? newValue) {
+                                                    setState(() {
+                                                      selectedruta = newValue;
+                                                    });
+                                                  },
+                                                );
+                                              }),
+                                              Center(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child:
+                                                            Text("Cancelar")),
+                                                    ElevatedButton(
+                                                        onPressed: () async{
+                                                          showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return const AlertDialog(
+                                                                content: Row(
+                                                                  children: [
+                                                                    CircularProgressIndicator(
+                                                                      backgroundColor: Color.fromARGB(
+                                                                          255,
+                                                                          126,
+                                                                          218,
+                                                                          21),
+                                                                    ),
+                                                                    SizedBox(
+                                                                        width:
+                                                                            20),
+                                                                    Text(
+                                                                        "Cargando..."),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            },
+                                                          );
+                                                          print(
+                                                              "actualizando a la ruta");
+                                                          await updaterutapedido(
+                                                              hoyexpress[index]
+                                                                  .id,
+                                                              selectedruta!.id,
+                                                              "en proceso");
+                                                          Navigator.pop(
+                                                              context);
+                                                          Navigator.pop(
+                                                              context);
+                                                              setState(() {
+                                                                
+                                                              });
+                                                        },
+                                                        style: ButtonStyle(
+                                                            backgroundColor:
+                                                                WidgetStateProperty
+                                                                    .all(Color.fromARGB(255, 60, 93, 224))),
+                                                        child: const Text(
+                                                          "Confirmar",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        ))
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              },
+                              icon: const Icon(
+                                Icons.add,
+                                size: 25,
+                                color: const Color.fromARGB(255, 255, 230, 0),
+                              )),
+                        ),
+                      ],
+                    );
+                  })
+              : Container(
+                  padding: const EdgeInsets.all(8),
+
+                  //color: Colors.grey,
+                  height: MediaQuery.of(context).size.height / 2.45,
+                  width: 250,
+                  decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 255, 255, 255)),
+                  child: const Center(
+                      child: Text(
+                    "No hay pedidos Express",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )),
+                ),
         )
       ],
     );

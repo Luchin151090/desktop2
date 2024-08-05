@@ -24,7 +24,7 @@ class _MenuState extends State<Menu> {
           children: [
             Container(
               width: 80,
-              color: const Color.fromARGB(255, 231, 211, 211),
+              color: Color.fromARGB(255, 44, 41, 52),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [

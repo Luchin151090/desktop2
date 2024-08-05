@@ -14,18 +14,26 @@ import 'dart:convert';
 class PedidoRuta {
   final int id;
   final int ruta_id;
-  final int cliente_id;
+  final String nombre_cliente;
+  final String apellidos_cliente;
+  final String telefono_cliente;
   final double total;
+  final String fecha;
   final String tipo;
-  final String estado;
+  final String distrito;
+  final String direccion;
 
   PedidoRuta(
       {required this.id,
       required this.ruta_id,
-      required this.cliente_id,
+      required this.nombre_cliente,
+      required this.apellidos_cliente,
+      required this.telefono_cliente,
       required this.total,
+      required this.fecha,
       required this.tipo,
-      required this.estado});
+      required this.distrito,
+      required this.direccion});
 }
 
 class Ruta {
@@ -169,8 +177,7 @@ class _RutasState extends State<Rutas> {
   final ScrollController _scrollController3 = ScrollController();
   List<Ruta> rutasempleado = [];
   int numeroruta = 0;
-  List<PedidoRuta>pedidosruta=[];
-
+  List<PedidoRuta> pedidosruta = [];
 
   @override
   void dispose() {
@@ -186,23 +193,30 @@ class _RutasState extends State<Rutas> {
     getallrutasempleado();
   }
 
-
   Future<dynamic> getpedidosruta(rutaid) async {
+    print("-----ruta---");
+    print(rutaid);
     try {
       var res = await http.get(Uri.parse(api + rutapedidos + rutaid.toString()),
           headers: {"Content-type": "application/json"});
       if (res.statusCode == 200) {
         var data = json.decode(res.body);
+        print("rutita--------------");
+        print(data);
         List<PedidoRuta> tempPedido = data.map<PedidoRuta>((data) {
           return PedidoRuta(
-              id: data['id'],
+              id: data['pedido_id'],
               ruta_id: data['ruta_id'],
-              cliente_id: data['cliente_id'],
+              nombre_cliente:data['nombre_cliente'], // cliente_nr_id : 53 //cliente_id : null
+              apellidos_cliente: data['apellidos_cliente'],
+              telefono_cliente: data['telefono_cliente'],
               total: data['total']?.toDouble() ?? 0.0,
+              fecha: data['fecha'].toString(),
               tipo: data['tipo'],
-              estado: data['estado']);
+              distrito: data['distrito'],
+              direccion: data['direccion']);
         }).toList();
-        if(mounted){
+        if (mounted) {
           pedidosruta = tempPedido;
         }
       }
@@ -356,7 +370,7 @@ class _RutasState extends State<Rutas> {
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
-                  fontSize: MediaQuery.of(context).size.height / 40),
+                  fontSize: MediaQuery.of(context).size.height / 45),
             ),
           ],
         ),
@@ -367,7 +381,7 @@ class _RutasState extends State<Rutas> {
             //color: Color.fromARGB(255, 206, 161, 195)
           ),
           width: MediaQuery.of(context).size.width / 8,
-          height: MediaQuery.of(context).size.height / 1.15,
+          height: MediaQuery.of(context).size.height / 1.2,
           child: numeroruta > 0
               ? ListView.builder(
                   padding: const EdgeInsets.all(0),
@@ -379,7 +393,7 @@ class _RutasState extends State<Rutas> {
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: const Color.fromARGB(255, 214, 214, 214),
+                        color: Color.fromARGB(255, 255, 255, 255),
                       ),
                       child: Center(
                           child: Column(
@@ -392,172 +406,209 @@ class _RutasState extends State<Rutas> {
                                   icon: const Icon(Icons.visibility)),
                               IconButton(
                                   onPressed: () {
-                                    showDialog(context: context, builder: (BuildContext context){
-                                      return Dialog(
-                                        child: Container(
-            width:
-                400, // Ajusta el tamaño del contenedor principal según tus necesidades
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Bidón 20'),
-                    DropdownButton<int>(
-                      value: 15,
-                      items: List.generate(
-                        30,
-                        (index) => DropdownMenuItem(
-                          child: Text(index.toString()),
-                          value: index,
-                        ),
-                      ),
-                      onChanged: (value) {},
-                    ),
-                    Text("16"),
-                    ElevatedButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Confirmar',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
-                  ],
-                ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('700ml'),
-                    DropdownButton<int>(
-                      value: 15,
-                      items: List.generate(
-                        30,
-                        (index) => DropdownMenuItem(
-                          child: Text(index.toString()),
-                          value: index,
-                        ),
-                      ),
-                      onChanged: (value) {},
-                    ),
-                    Text("16"),
-                    ElevatedButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Confirmar',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
-                  ],
-                ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('3 Litros'),
-                    DropdownButton<int>(
-                      value: 15,
-                      items: List.generate(
-                        30,
-                        (index) => DropdownMenuItem(
-                          child: Text(index.toString()),
-                          value: index,
-                        ),
-                      ),
-                      onChanged: (value) {},
-                    ),
-                    Text("16"),
-                    ElevatedButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Confirmar',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
-                  ],
-                ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('7 Litros'),
-                    DropdownButton<int>(
-                      value: 15,
-                      items: List.generate(
-                        30,
-                        (index) => DropdownMenuItem(
-                          child: Text(index.toString()),
-                          value: index,
-                        ),
-                      ),
-                      onChanged: (value) {},
-                    ),
-                    Text("16"),
-                    ElevatedButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Confirmar',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
-                  ],
-                ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Recarga'),
-                    DropdownButton<int>(
-                      value: 15,
-                      items: List.generate(
-                        30,
-                        (index) => DropdownMenuItem(
-                          child: Text(index.toString()),
-                          value: index,
-                        ),
-                      ),
-                      onChanged: (value) {},
-                    ),
-                    Text("16"),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Confirmar',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-                                      );
-                                    });
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Dialog(
+                                            child: Container(
+                                              width:
+                                                  400, // Ajusta el tamaño del contenedor principal según tus necesidades
+                                              padding: EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.5),
+                                                    spreadRadius: 5,
+                                                    blurRadius: 7,
+                                                    offset: Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text('Bidón 20'),
+                                                      DropdownButton<int>(
+                                                        value: 15,
+                                                        items: List.generate(
+                                                          30,
+                                                          (index) =>
+                                                              DropdownMenuItem(
+                                                            child: Text(index
+                                                                .toString()),
+                                                            value: index,
+                                                          ),
+                                                        ),
+                                                        onChanged: (value) {},
+                                                      ),
+                                                      Text("16"),
+                                                      ElevatedButton(
+                                                          onPressed: () {},
+                                                          child: Text(
+                                                            'Confirmar',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          )),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 16),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text('700ml'),
+                                                      DropdownButton<int>(
+                                                        value: 15,
+                                                        items: List.generate(
+                                                          30,
+                                                          (index) =>
+                                                              DropdownMenuItem(
+                                                            child: Text(index
+                                                                .toString()),
+                                                            value: index,
+                                                          ),
+                                                        ),
+                                                        onChanged: (value) {},
+                                                      ),
+                                                      Text("16"),
+                                                      ElevatedButton(
+                                                          onPressed: () {},
+                                                          child: Text(
+                                                            'Confirmar',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          )),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 16),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text('3 Litros'),
+                                                      DropdownButton<int>(
+                                                        value: 15,
+                                                        items: List.generate(
+                                                          30,
+                                                          (index) =>
+                                                              DropdownMenuItem(
+                                                            child: Text(index
+                                                                .toString()),
+                                                            value: index,
+                                                          ),
+                                                        ),
+                                                        onChanged: (value) {},
+                                                      ),
+                                                      Text("16"),
+                                                      ElevatedButton(
+                                                          onPressed: () {},
+                                                          child: Text(
+                                                            'Confirmar',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          )),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 16),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text('7 Litros'),
+                                                      DropdownButton<int>(
+                                                        value: 15,
+                                                        items: List.generate(
+                                                          30,
+                                                          (index) =>
+                                                              DropdownMenuItem(
+                                                            child: Text(index
+                                                                .toString()),
+                                                            value: index,
+                                                          ),
+                                                        ),
+                                                        onChanged: (value) {},
+                                                      ),
+                                                      Text("16"),
+                                                      ElevatedButton(
+                                                          onPressed: () {},
+                                                          child: Text(
+                                                            'Confirmar',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          )),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 16),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text('Recarga'),
+                                                      DropdownButton<int>(
+                                                        value: 15,
+                                                        items: List.generate(
+                                                          30,
+                                                          (index) =>
+                                                              DropdownMenuItem(
+                                                            child: Text(index
+                                                                .toString()),
+                                                            value: index,
+                                                          ),
+                                                        ),
+                                                        onChanged: (value) {},
+                                                      ),
+                                                      Text("16"),
+                                                      ElevatedButton(
+                                                        onPressed: () {},
+                                                        child: Text(
+                                                          'Confirmar',
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        });
                                   },
                                   icon: const Icon(Icons.warehouse))
                             ],
@@ -593,6 +644,7 @@ class _RutasState extends State<Rutas> {
                                           backgroundColor: Colors.deepPurple,
                                         );
 
+                                        print(rutasempleado[index].id);
                                         await getpedidosruta(
                                             rutasempleado[index].id);
 
@@ -1000,7 +1052,8 @@ class _RutasState extends State<Rutas> {
                                                                   child: ListView
                                                                       .builder(
                                                                     itemCount:
-                                                                        pedidosruta.length,
+                                                                        pedidosruta
+                                                                            .length,
                                                                     /* distrito_de_pedido
                                                                             .length*/
                                                                     itemBuilder:
@@ -1026,22 +1079,51 @@ class _RutasState extends State<Rutas> {
                                                                             ListTile(
                                                                           title:
                                                                               Column(
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                children: [
-                                                                                  Text("Pedido N°:${pedidosruta[index].id}",style:const TextStyle(
-                                                                                    fontSize: 12,fontWeight: FontWeight.bold
-                                                                                  ),),
-                                                                                  Text("Ruta: ${pedidosruta[index].ruta_id}",style:const TextStyle(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Text(
+                                                                                "Pedido N°:${pedidosruta[index].id}",
+                                                                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                              Text("Ruta: ${pedidosruta[index].ruta_id}",
+                                                                                  style: const TextStyle(
                                                                                     fontSize: 12,
                                                                                   )),
-                                                                                  Text("Estado: ${pedidosruta[index].estado}",style:const TextStyle(
+                                                                              Text("Nombre: ${pedidosruta[index].nombre_cliente}",
+                                                                                  style: const TextStyle(
                                                                                     fontSize: 12,
                                                                                   )),
-                                                                                  Text("Tipo: ${pedidosruta[index].tipo}",style:const TextStyle(
+                                                                              Text("Apellidos: ${pedidosruta[index].apellidos_cliente}",
+                                                                                  style: const TextStyle(
                                                                                     fontSize: 12,
-                                                                                  ))
-                                                                                ],
-                                                                              ), //Text(distrito_de_pedido[index].nombre),
+                                                                                  )),
+                                                                                   Text(
+                                                                                "Telefono:${pedidosruta[index].telefono_cliente}",
+                                                                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                              Text("Total: ${pedidosruta[index].total}",
+                                                                                  style: const TextStyle(
+                                                                                    fontSize: 12,
+                                                                                  )),
+                                                                              Text("Fecha: ${pedidosruta[index].fecha}",
+                                                                                  style: const TextStyle(
+                                                                                    fontSize: 12,
+                                                                                  )),
+                                                                              Text("Tipo: ${pedidosruta[index].tipo}",
+                                                                                  style: const TextStyle(
+                                                                                    fontSize: 12,
+                                                                                  )),
+                                                                            Text("Distrito: ${pedidosruta[index].distrito}",
+                                                                                  style: const TextStyle(
+                                                                                    fontSize: 12,
+                                                                                  )),
+                                                                              Text("Direccion: ${pedidosruta[index].direccion}",
+                                                                                  style: const TextStyle(
+                                                                                    fontSize: 12,
+                                                                                  )),
+                                                                            ],
+                                                                          ), //Text(distrito_de_pedido[index].nombre),
                                                                           trailing:
                                                                               IconButton(
                                                                             icon:
@@ -1065,9 +1147,7 @@ class _RutasState extends State<Rutas> {
                                                                                                 child: const Text('Cancelar'),
                                                                                               ),
                                                                                               TextButton(
-                                                                                                onPressed: () {
-                                                                                                  
-                                                                                                },
+                                                                                                onPressed: () {},
                                                                                                 child: const Text('Si'),
                                                                                               ),
                                                                                             ],
@@ -1187,7 +1267,7 @@ class _RutasState extends State<Rutas> {
               : Container(
                   child: const Center(
                       child: Text(
-                    "No hay rutas chiveras.",
+                    "No hay rutas hoy",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   )),

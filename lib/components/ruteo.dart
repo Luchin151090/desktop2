@@ -726,391 +726,388 @@ class _RuteoState extends State<Ruteo> {
   Widget build(BuildContext context) {
     final marcadorProvider = Provider.of<MarcadorProvider>(context);
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 91, 89, 107).withOpacity(0.95),
+      backgroundColor: Color.fromARGB(255, 156, 156, 156),
       body: Container(
-          padding: const EdgeInsets.all(19),
+          padding: const EdgeInsets.all(9),
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                width: 10,
-              ),
-
-              // ITEMS
-              const Agendados(),
-
-              const SizedBox(
-                width: 10,
-              ),
-
-              // TIEMPO REAL
-              const Tiemporeal(),
-
-              const SizedBox(
-                width: 10,
-              ),
-
-              //MAPA
-              Column(
-                children: [
-                  Text(
-                    "Mapa de pedidos",
+              Container(
+                  margin: const EdgeInsets.only(left: 50),
+                  child: Text(
+                    "Sistema de Ruteo",
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: MediaQuery.of(context).size.height / 35),
+                  )),
+              Row(
+                children: [
+                  const SizedBox(
+                    width: 10,
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        //color: Color.fromARGB(255, 198, 172, 181),
-                        borderRadius: BorderRadius.circular(20)),
-                    width: MediaQuery.of(context).size.width / 2.2,
-                    height: MediaQuery.of(context).size.height / 1.1,
-                    child: Stack(
-                      children: [
-                        FlutterMap(
-                          options: const MapOptions(
-                            initialCenter: LatLng(-16.4055657, -71.5719081),
-                            initialZoom: 14.0,
-                          ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                              userAgentPackageName: 'com.example.app',
-                            ),
-                            MarkerLayer(
-                              markers: [
-                                ...marcadores,
-                                ...marcadorProvider.marcadoresHoyE,
-                                ...marcadorProvider.marcadoresHoyN
 
-                                //...expressmarker,
-                                // ...normalmarker,
+                  // ITEMS
+                  const Agendados(),
+
+                  const SizedBox(
+                    width: 10,
+                  ),
+
+                  // TIEMPO REAL
+                  const Tiemporeal(),
+
+                  const SizedBox(
+                    width: 10,
+                  ),
+
+                  //MAPA
+                  Column(
+                    children: [
+                      Text(
+                        "Mapa de pedidos",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: MediaQuery.of(context).size.height / 45),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            //color: Color.fromARGB(255, 198, 172, 181),
+                            borderRadius: BorderRadius.circular(20)),
+                        width: MediaQuery.of(context).size.width / 2.2,
+                        height: MediaQuery.of(context).size.height / 1.2,
+                        child: Stack(
+                          children: [
+                            FlutterMap(
+                              options: const MapOptions(
+                                initialCenter: LatLng(-16.4055657, -71.5719081),
+                                initialZoom: 14.0,
+                              ),
+                              children: [
+                                TileLayer(
+                                  urlTemplate:
+                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  userAgentPackageName: 'com.example.app',
+                                ),
+                                MarkerLayer(
+                                  markers: [
+                                    ...marcadores,
+                                    ...marcadorProvider.marcadoresHoyE,
+                                    ...marcadorProvider.marcadoresHoyN
+
+                                    //...expressmarker,
+                                    // ...normalmarker,
+                                  ],
+                                ),
                               ],
                             ),
-                          ],
-                        ),
-                        Positioned(
-                            top: 10,
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              decoration: const BoxDecoration(
-                                  //color: Colors.blue,
-                                  ),
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    showDialog(
-                                        context: context,
-                                        barrierColor: const Color.fromARGB(
-                                                255, 241, 204, 204)
-                                            .withOpacity(0.35),
-                                        builder: (BuildContext context) {
-                                          return Dialog(
-                                            backgroundColor:
-                                                const Color.fromARGB(
-                                                    255, 205, 190, 216),
-                                            surfaceTintColor:
-                                                const Color.fromARGB(
-                                                    255, 219, 212, 227),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20)),
-                                              padding: const EdgeInsets.all(15),
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height /
-                                                  1.2,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  1.3,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Center(
-                                                      child: Text(
-                                                    "Crea tu ruta",
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  )),
-                                                  const SizedBox(
-                                                    height: 50,
-                                                  ),
+                            Positioned(
+                                top: 10,
+                                child: Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: const BoxDecoration(
+                                      //color: Colors.blue,
+                                      ),
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            barrierColor: const Color.fromARGB(
+                                                    255, 255, 255, 255)
+                                                .withOpacity(0.35),
+                                            builder: (BuildContext context) {
+                                              return Dialog(
+                                                backgroundColor:
+                                                    const Color.fromARGB(
+                                                        255, 255, 255, 255),
+                                                surfaceTintColor:
+                                                    const Color.fromARGB(
+                                                        255, 255, 255, 255),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20)),
+                                                  padding:
+                                                      const EdgeInsets.all(15),
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height /
+                                                      1.2,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width /
+                                                      1.3,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const Center(
+                                                          child: Text(
+                                                        "Crea tu ruta",
+                                                        style: TextStyle(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      )),
+                                                      const SizedBox(
+                                                        height: 10,
+                                                      ),
 
-                                                  // DROPS MENUS GENERICOS
-                                                  // LIST VIEW DE PEDIDOS DISTRITOS
-                                                  Container(
-                                                    child: Row(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        // DROPS
-                                                        Container(
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width /
-                                                              6,
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height /
-                                                              2,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10),
-                                                          color: const Color
-                                                              .fromARGB(255,
-                                                              250, 203, 219),
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Container(
-                                                                color: Colors
-                                                                    .white,
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(8),
-                                                                child:
-                                                                    TextField(
-                                                                  controller:
-                                                                      _text1,
-                                                                  decoration:
-                                                                      const InputDecoration(
-                                                                    labelText:
-                                                                        'Nombre de ruta',
-                                                                  ),
-                                                                  keyboardType:
-                                                                      TextInputType
-                                                                          .number,
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                width: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .width /
-                                                                    6,
-                                                                color: Colors
-                                                                    .white,
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(8),
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Text(
-                                                                        "Conductores"),
-                                                                    StatefulBuilder(builder: (BuildContext
-                                                                            context,
-                                                                        StateSetter
-                                                                            setState) {
-                                                                      return DropdownButton(
-                                                                        hint: const Text(
-                                                                            'Conductores'),
-                                                                        value:
-                                                                            selectedConductor,
-                                                                        items: conductorget.map((Conductor
-                                                                            chofer) {
-                                                                          return DropdownMenuItem<
-                                                                              Conductor>(
-                                                                            value:
-                                                                                chofer,
-                                                                            child:
-                                                                                Text("${chofer.nombres}"),
-                                                                          );
-                                                                        }).toList(),
-                                                                        onChanged:
-                                                                            (Conductor?
-                                                                                newValue) {
-                                                                          setState(
-                                                                              () {
-                                                                            selectedConductor =
-                                                                                newValue;
-                                                                          });
-                                                                        },
-                                                                      );
-                                                                    }),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                              // VEHICULOS-----------
-                                                              Container(
-                                                                color: Colors
-                                                                    .white,
-                                                                width: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .width /
-                                                                    6,
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(8),
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    const Text(
-                                                                        "Vehículos"),
-                                                                    StatefulBuilder(builder: (BuildContext
-                                                                            context,
-                                                                        StateSetter
-                                                                            setState) {
-                                                                      return DropdownButton(
-                                                                        hint: const Text(
-                                                                            'Vehículos'),
-                                                                        value:
-                                                                            selectedVehiculo,
-                                                                        items: vehiculos.map((Vehiculo
-                                                                            auto) {
-                                                                          return DropdownMenuItem<
-                                                                              Vehiculo>(
-                                                                            value:
-                                                                                auto,
-                                                                            child:
-                                                                                Text("${auto.nombre_modelo}"),
-                                                                          );
-                                                                        }).toList(),
-                                                                        onChanged:
-                                                                            (Vehiculo?
-                                                                                newValue) {
-                                                                          setState(
-                                                                              () {
-                                                                            selectedVehiculo =
-                                                                                newValue;
-                                                                          });
-                                                                        },
-                                                                      );
-                                                                    }),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 20,
-                                                        ),
-                                                        //LISTVIEW
-                                                        Container(
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width /
-                                                              4,
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height /
-                                                              2.5,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10),
-                                                          color: const Color
-                                                              .fromARGB(255,
-                                                              242, 222, 255),
-                                                          child:
-                                                              GestureDetector(
-                                                            behavior:
-                                                                HitTestBehavior
-                                                                    .translucent,
-                                                            onHorizontalDragUpdate:
-                                                                (details) {
-                                                              _scrollController2.jumpTo(
-                                                                  _scrollController2
-                                                                          .position
-                                                                          .pixels +
-                                                                      details
-                                                                          .primaryDelta!);
-                                                            },
-                                                            child:
-                                                                SingleChildScrollView(
-                                                              controller:
-                                                                  _scrollController2,
-                                                              scrollDirection:
-                                                                  Axis.horizontal,
-                                                              child: Row(
-                                                                children: List
-                                                                    .generate(
-                                                                  distrito_de_pedido
-                                                                      .length,
-                                                                  (index) =>
-                                                                      Container(
-                                                                    width: 250,
-                                                                    margin: const EdgeInsets
-                                                                        .only(
-                                                                        left:
-                                                                            10),
+                                                      // DROPS MENUS GENERICOS
+                                                      // LIST VIEW DE PEDIDOS DISTRITOS
+                                                      Container(
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            // DROPS
+                                                            Container(
+                                                              //margin: EdgeInsets.only(top: 19),
+                                                              width: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width /
+                                                                  6,
+                                                              height: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .height /
+                                                                  2.5,
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(1),
+                                                              color: const Color
+                                                                  .fromARGB(255,
+                                                                  80, 176, 184),
+                                                              child: Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  // CONDUCTORES
+                                                                  Container(
+                                                                    width: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width /
+                                                                        6,
+                                                                    color: Colors
+                                                                        .white,
                                                                     padding:
                                                                         const EdgeInsets
                                                                             .all(
                                                                             8),
-                                                                    child: Card(
-                                                                      elevation:
-                                                                          8,
-                                                                      borderOnForeground:
-                                                                          true,
-                                                                      color: Colors
-                                                                          .white,
-                                                                      child:
-                                                                          Padding(
+                                                                    child:
+                                                                        Column(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        const Text(
+                                                                            "Conductores"),
+                                                                        StatefulBuilder(builder: (BuildContext
+                                                                                context,
+                                                                            StateSetter
+                                                                                setState) {
+                                                                          return DropdownButton(
+                                                                            hint:
+                                                                                const Text('Conductores'),
+                                                                            value:
+                                                                                selectedConductor,
+                                                                            items:
+                                                                                conductorget.map((Conductor chofer) {
+                                                                              return DropdownMenuItem<Conductor>(
+                                                                                value: chofer,
+                                                                                child: Text("${chofer.nombres}"),
+                                                                              );
+                                                                            }).toList(),
+                                                                            onChanged:
+                                                                                (Conductor? newValue) {
+                                                                              setState(() {
+                                                                                selectedConductor = newValue;
+                                                                              });
+                                                                            },
+                                                                          );
+                                                                        }),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  // VEHICULOS-----------
+                                                                  Container(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    width: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width /
+                                                                        6,
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .all(
+                                                                            8),
+                                                                    child:
+                                                                        Column(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        const Text(
+                                                                            "Vehículos"),
+                                                                        StatefulBuilder(builder: (BuildContext
+                                                                                context,
+                                                                            StateSetter
+                                                                                setState) {
+                                                                          return DropdownButton(
+                                                                            hint:
+                                                                                const Text('Vehículos'),
+                                                                            value:
+                                                                                selectedVehiculo,
+                                                                            items:
+                                                                                vehiculos.map((Vehiculo auto) {
+                                                                              return DropdownMenuItem<Vehiculo>(
+                                                                                value: auto,
+                                                                                child: Text("${auto.nombre_modelo}"),
+                                                                              );
+                                                                            }).toList(),
+                                                                            onChanged:
+                                                                                (Vehiculo? newValue) {
+                                                                              setState(() {
+                                                                                selectedVehiculo = newValue;
+                                                                              });
+                                                                            },
+                                                                          );
+                                                                        }),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 20,
+                                                            ),
+                                                            //LISTVIEW
+                                                            Container(
+                                                              width: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width /
+                                                                  4,
+                                                              height: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .height /
+                                                                  2.5,
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(10),
+                                                              color: const Color
+                                                                  .fromARGB(
+                                                                  255,
+                                                                  212,
+                                                                  212,
+                                                                  212),
+                                                              child:
+                                                                  GestureDetector(
+                                                                behavior:
+                                                                    HitTestBehavior
+                                                                        .translucent,
+                                                                onHorizontalDragUpdate:
+                                                                    (details) {
+                                                                  _scrollController2.jumpTo(_scrollController2
+                                                                          .position
+                                                                          .pixels +
+                                                                      details
+                                                                          .primaryDelta!);
+                                                                },
+                                                                child:
+                                                                    SingleChildScrollView(
+                                                                  controller:
+                                                                      _scrollController2,
+                                                                  scrollDirection:
+                                                                      Axis.horizontal,
+                                                                  child: Row(
+                                                                    children: List
+                                                                        .generate(
+                                                                      distrito_de_pedido
+                                                                          .length,
+                                                                      (index) =>
+                                                                          Container(
+                                                                        width:
+                                                                            250,
+                                                                        margin: const EdgeInsets
+                                                                            .only(
+                                                                            left:
+                                                                                10),
                                                                         padding: const EdgeInsets
                                                                             .all(
-                                                                            8.0),
+                                                                            8),
                                                                         child:
-                                                                            Column(
-                                                                          children: [
-                                                                            // NOMBRE DEL DISTRITO DINAMICO
-                                                                            Text(distrito_de_pedido[index]),
-                                                                            Container(
-                                                                              width: 200,
-                                                                              height: 200,
-                                                                              //color: Colors.blue,
-                                                                              margin: const EdgeInsets.all(5),
-                                                                              child: ListView.builder(
-                                                                                itemCount: distrito_pedido['${distrito_de_pedido[index]}']!.length,
-                                                                                itemBuilder: (BuildContext context, int index2) {
-                                                                                  return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-                                                                                    return Container(
-                                                                                      margin: const EdgeInsets.all(5),
-                                                                                      color: const Color.fromARGB(255, 153, 218, 222),
-                                                                                      child: CheckboxListTile(
-                                                                                        value: distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado,
-                                                                                        onChanged: (bool? value) {
-                                                                                          setState(() {
-                                                                                            print("seleccionando");
+                                                                            Card(
+                                                                          elevation:
+                                                                              8,
+                                                                          borderOnForeground:
+                                                                              true,
+                                                                          color:
+                                                                              Colors.white,
+                                                                          child:
+                                                                              Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.all(8.0),
+                                                                            child:
+                                                                                Column(
+                                                                              children: [
+                                                                                // NOMBRE DEL DISTRITO DINAMICO
+                                                                                Text(distrito_de_pedido[index]),
+                                                                                Container(
+                                                                                  width: 200,
+                                                                                  height: 200,
+                                                                                  //color: Colors.blue,
+                                                                                  margin: const EdgeInsets.all(5),
+                                                                                  child: ListView.builder(
+                                                                                    itemCount: distrito_pedido['${distrito_de_pedido[index]}']!.length,
+                                                                                    itemBuilder: (BuildContext context, int index2) {
+                                                                                      return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+                                                                                        return Container(
+                                                                                          margin: const EdgeInsets.all(5),
+                                                                                          color: const Color.fromARGB(255, 153, 218, 222),
+                                                                                          child: CheckboxListTile(
+                                                                                            value: distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado,
+                                                                                            onChanged: (bool? value) {
+                                                                                              setState(() {
+                                                                                                print("seleccionando");
 
-                                                                                            distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado = value!;
-                                                                                            print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado);
-                                                                                            print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].id);
+                                                                                                distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado = value!;
+                                                                                                print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado);
+                                                                                                print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].id);
 
-                                                                                            idPedidosSeleccionados.add(distrito_pedido['${distrito_de_pedido[index]}']![index2].id);
-                                                                                          });
-                                                                                        },
-                                                                                        title: Text("N° ${distrito_pedido['${distrito_de_pedido[index]}']?[index2].id}"),
-                                                                                        subtitle: Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].nombre}"),
-                                                                                      ),
-                                                                                    );
-                                                                                  });
-                                                                                },
-                                                                              ),
-                                                                            )
-                                                                          ],
+                                                                                                idPedidosSeleccionados.add(distrito_pedido['${distrito_de_pedido[index]}']![index2].id);
+                                                                                              });
+                                                                                            },
+                                                                                            title: Text("N° ${distrito_pedido['${distrito_de_pedido[index]}']?[index2].id}"),
+                                                                                            subtitle: Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].nombre}"),
+                                                                                          ),
+                                                                                        );
+                                                                                      });
+                                                                                    },
+                                                                                  ),
+                                                                                )
+                                                                              ],
+                                                                            ),
+                                                                          ),
                                                                         ),
                                                                       ),
                                                                     ),
@@ -1118,138 +1115,328 @@ class _RuteoState extends State<Ruteo> {
                                                                 ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 20,
-                                                        ),
-
-                                                        // MAPA DIALOGO
-                                                        Container(
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width /
-                                                              3.5,
-                                                          height: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .height /
-                                                              1.72,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10),
-                                                          color: const Color
-                                                              .fromARGB(255,
-                                                              190, 230, 221),
-                                                          // color: Colors.pink,
-                                                          child: FlutterMap(
-                                                            options:
-                                                                const MapOptions(
-                                                              initialCenter: LatLng(
-                                                                  -16.4055657,
-                                                                  -71.5719081),
-                                                              initialZoom:
-                                                                  10.85,
+                                                            const SizedBox(
+                                                              width: 20,
                                                             ),
-                                                            children: [
-                                                              TileLayer(
-                                                                urlTemplate:
-                                                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                                userAgentPackageName:
-                                                                    'com.example.app',
-                                                              ),
-                                                              MarkerLayer(
-                                                                markers: [
-                                                                  ...marcadores,
-                                                                  //...expressmarker,
-                                                                  // ...normalmarker,
+
+                                                            // MAPA DIALOGO
+                                                            Container(
+                                                              width: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width /
+                                                                  3.5,
+                                                              height: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .height /
+                                                                  2.5,
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(10),
+                                                              color: const Color
+                                                                  .fromARGB(
+                                                                  255,
+                                                                  211,
+                                                                  211,
+                                                                  211),
+                                                              // color: Colors.pink,
+                                                              child: FlutterMap(
+                                                                options:
+                                                                    const MapOptions(
+                                                                  initialCenter: LatLng(
+                                                                      -16.4055657,
+                                                                      -71.5719081),
+                                                                  initialZoom:
+                                                                      10.85,
+                                                                ),
+                                                                children: [
+                                                                  TileLayer(
+                                                                    urlTemplate:
+                                                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                    userAgentPackageName:
+                                                                        'com.example.app',
+                                                                  ),
+                                                                  MarkerLayer(
+                                                                    markers: [
+                                                                      ...marcadores,
+                                                                      //...expressmarker,
+                                                                      // ...normalmarker,
+                                                                    ],
+                                                                  ),
                                                                 ],
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+
+                                                      const SizedBox(
+                                                        height: 49,
+                                                      ),
+                                                      Container(
+                                                        //color: Colors.green,
+                                                        child: Center(
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(7),
+                                                                height: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .height /
+                                                                    10,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: const Color
+                                                                      .fromARGB(
+                                                                      255,
+                                                                      61,
+                                                                      85,
+                                                                      209),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              20),
+                                                                ),
+                                                                child:
+                                                                    const Center(
+                                                                  child: Text(
+                                                                    "Cuando no exista pedidos agendados, puedes crear aquí una ruta para los pedidos de tiempo real.",
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .justify,
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        color: Colors
+                                                                            .white,
+                                                                        fontSize:
+                                                                            16),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Container(
+                                                                width: 100,
+                                                                height: 100,
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            50)),
+                                                                child:
+                                                                    ElevatedButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                              showDialog(context: context,
+                                                                               builder: (BuildContext context){
+                                                                                return Dialog(
+                                                                                  child: Container(
+                                                                                    width: 200,
+                                                                                    height: 60,
+                                                                                    child: Center(
+                                                                                      child: Row(
+                                                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                                        children: [
+                                                                                          TextButton(onPressed: (){
+                                                                                            Navigator.pop(context);
+                                                                                          },
+                                                                                           child:const Text("Cancelar")),
+                                                                                           
+                                                                                          TextButton(onPressed: ()async{
+                                                                                      print(selectedConductor!.id);
+                                                                                          print(selectedVehiculo!.id);
+                                                                                            await createRuta(1,selectedConductor!.id,
+                                                                                            selectedVehiculo!.id,
+                                                                                             0, 0);
+                                                                                          },
+                                                                                           child:const Text("Confirmar"))
+                                                                                        ],
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                );
+                                                                               });
+                                                                               
+                                                                            },
+                                                                        style: ButtonStyle(
+                                                                            elevation: WidgetStateProperty.all(
+                                                                                6),
+                                                                            backgroundColor: WidgetStateProperty.all(const Color.fromARGB(
+                                                                                255,
+                                                                                131,
+                                                                                131,
+                                                                                131))),
+                                                                        child:
+                                                                            const Text(
+                                                                          "Crear",
+                                                                          style:
+                                                                              TextStyle(color: Colors.white),
+                                                                        )),
                                                               ),
                                                             ],
                                                           ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
-
-                                                  const SizedBox(
-                                                    height: 49,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Center(
-                                                        child: ElevatedButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child:
-                                                                Text("Cerrar")),
+                                                        ),
                                                       ),
-                                                      Container(
-                                                        child: ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              print(
-                                                                  "iid.........s");
-                                                              print(
-                                                                  selectedConductor!
-                                                                      .id);
-                                                              print(
-                                                                  selectedVehiculo!
-                                                                      .id);
-                                                              await crearobtenerYactualizarRuta(
-                                                                  1,
-                                                                  selectedConductor!
-                                                                      .id,
-                                                                  selectedVehiculo!
-                                                                      .id,
-                                                                  0,
-                                                                  0,
-                                                                  'en proceso');
+                                                      const SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        //crossAxisAlignment: CrossAxisAlignment.center,
+                                                        children: [
+                                                          Container(
+                                                            width: 100,
+                                                            height: 100,
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            50)),
+                                                            child:
+                                                                ElevatedButton(
+                                                              onPressed: () {
+                                                                Navigator.pop(
+                                                                    context);
+                                                              },
+                                                              style: ButtonStyle(
+                                                                  elevation:
+                                                                      WidgetStateProperty
+                                                                          .all(
+                                                                              6),
+                                                                  backgroundColor:
+                                                                      WidgetStateProperty.all(
+                                                                          Colors
+                                                                              .white)),
+                                                              child: const Text(
+                                                                  "Cerrar"),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 20,
+                                                          ),
+                                                          Container(
+                                                            width: 100,
+                                                            height: 100,
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            50)),
+                                                            child:
+                                                                ElevatedButton(
+                                                                    onPressed:
+                                                                        () async {
+                                                                      showDialog(
+                                                                        context:
+                                                                            context,
+                                                                        builder:
+                                                                            (BuildContext
+                                                                                context) {
+                                                                          return AlertDialog(
+                                                                            content:
+                                                                                Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
 
-                                                              print("holiiiii");
-                                                            },
-                                                            style: ButtonStyle(
-                                                                backgroundColor:
-                                                                    WidgetStateProperty
-                                                                        .all(Colors
-                                                                            .purple)),
-                                                            child: const Text(
-                                                              " Crear Ruta",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                            )),
+                                                                              children: [
+                                                                                TextButton(onPressed: () {
+                                                                                  Navigator.pop(context);
+                                                                                }, child:const Text("Cancelar")),
+                                                                                const SizedBox(width: 10,),
+                                                                                TextButton(
+                                                                                    onPressed: () async {
+                                                                                      showDialog(
+                                                                                        context: context,
+                                                                                        builder: (BuildContext context) {
+                                                                                          return const AlertDialog(
+                                                                                            content: Row(
+                                                                                              children: [
+                                                                                                CircularProgressIndicator(
+                                                                                                  backgroundColor: Colors.green,
+                                                                                                ),
+                                                                                                SizedBox(width: 20),
+                                                                                                Text("Cargando..."),
+                                                                                              ],
+                                                                                            ),
+                                                                                          );
+                                                                                        },
+                                                                                      );
+                                                                                      print("iid.........s");
+                                                                                      print(selectedConductor!.id);
+                                                                                      print(selectedVehiculo!.id);
+                                                                                      await crearobtenerYactualizarRuta(1, selectedConductor!.id, selectedVehiculo!.id, 0, 0, 'en proceso');
+                                                                                      Navigator.pop(context);
+                                                                                      Navigator.pop(context);
+
+                                                                                      print("holiiiii");
+                                                                                    },
+                                                                                    child:const Text("Continuar")),
+                                                                              ],
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                      );
+                                                                    },
+                                                                    style: ButtonStyle(
+                                                                        elevation:
+                                                                            WidgetStateProperty.all(
+                                                                                7),
+                                                                        backgroundColor: WidgetStateProperty.all(const Color
+                                                                            .fromARGB(
+                                                                            255,
+                                                                            98,
+                                                                            69,
+                                                                            229))),
+                                                                    child:
+                                                                        const Text(
+                                                                      "Crear",
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white),
+                                                                    )),
+                                                          )
+                                                        ],
                                                       )
                                                     ],
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        });
-                                  },
-                                  style: ButtonStyle(
-                                      elevation: WidgetStateProperty.all(20),
-                                      backgroundColor: WidgetStateProperty.all(
-                                          const Color.fromARGB(
-                                              255, 103, 84, 175))),
-                                  child: const Text(
-                                    "Crear ruta",
-                                    style: TextStyle(
-                                        fontSize: 11, color: Colors.white),
-                                  )),
-                            ))
-                      ],
-                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                      },
+                                      style: ButtonStyle(
+                                          elevation:
+                                              WidgetStateProperty.all(20),
+                                          backgroundColor:
+                                              WidgetStateProperty.all(
+                                                  Color.fromARGB(
+                                                      255, 78, 105, 226))),
+                                      child: const Text(
+                                        "Crear ruta",
+                                        style: TextStyle(
+                                            fontSize: 11, color: Colors.white),
+                                      )),
+                                ))
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
+
+                  // RUTAS CREADAS
+                  const Rutas(),
                 ],
               ),
-
-              // RUTAS CREADAS
-              const Rutas(),
             ],
           )),
     );

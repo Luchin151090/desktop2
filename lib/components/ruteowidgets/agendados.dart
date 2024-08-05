@@ -133,7 +133,7 @@ class _AgendadosState extends State<Agendados> {
           // TRAIGO LOS DISTRITOS DE LOS PEDIDOS DE AYER - SOLO LOS DE AYER
           for (var j = 0; j < pedidosget.length; j++) {
             fechaparseadas = DateTime.parse(pedidosget[j].fecha.toString());
-            if (pedidosget[j].estado == 'pendiente') {
+            if (pedidosget[j].estado == 'pendiente' || pedidosget[j].estado == 'en proceso') {  /// AQUI TAMBIEN SE PONE LOS PEDIDOS EN PROCESO QUE NO FUERON ATENDIDOS POR TIEMPO
               if (pedidosget[j].tipo == 'normal' ||
                   pedidosget[j].tipo == 'express') {
                 if (fechaparseadas.day != now.day) {
@@ -155,7 +155,7 @@ class _AgendadosState extends State<Agendados> {
             print(distrito_de_pedido[x]);
             for (var j = 0; j < pedidosget.length; j++) {
               fechaparseadas = DateTime.parse(pedidosget[j].fecha.toString());
-              if (pedidosget[j].estado == 'pendiente') {
+              if (pedidosget[j].estado == 'pendiente' || pedidosget[j].estado == 'en proceso') {
                 if (pedidosget[j].tipo == 'normal' ||
                     pedidosget[j].tipo == 'express') {
                   print("----------TIPO");
@@ -192,7 +192,7 @@ class _AgendadosState extends State<Agendados> {
           int count = 1;
           for (var i = 0; i < pedidosget.length; i++) {
             fechaparseadas = DateTime.parse(pedidosget[i].fecha.toString());
-            if (pedidosget[i].estado == 'pendiente') {
+            if (pedidosget[i].estado == 'pendiente' || pedidosget[i].estado == 'en proceso') {
               if (pedidosget[i].tipo == 'normal' ||
                   pedidosget[i].tipo == 'express') {
                 if (fechaparseadas.day != now.day) {
@@ -346,7 +346,7 @@ class _AgendadosState extends State<Agendados> {
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
-                  fontSize: MediaQuery.of(context).size.height / 35),
+                  fontSize: MediaQuery.of(context).size.height / 55),
             ),
             Container(
               padding: EdgeInsets.all(8),
@@ -355,7 +355,7 @@ class _AgendadosState extends State<Agendados> {
                 //color:const Color.fromARGB(255, 231, 231, 231)
               ),
               width: MediaQuery.of(context).size.width / 8,
-              height: MediaQuery.of(context).size.height / 1.1,
+              height: MediaQuery.of(context).size.height / 1.2,
               child: number > 0
                   ? ListView.builder(
                       padding: const EdgeInsets.all(8),
@@ -367,8 +367,8 @@ class _AgendadosState extends State<Agendados> {
                           margin: EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            color: Color.fromARGB(255, 174, 151, 179)
-                                .withOpacity(0.82),
+                            color: Color.fromRGBO(48, 59, 93, 1)
+                               
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,24 +383,37 @@ class _AgendadosState extends State<Agendados> {
                               )),
                               Text(
                                 "Estado: ${agendados[index].estado}",
-                                style: TextStyle(
-                                    color: Color.fromARGB(255, 255, 229, 183)),
+                                style:const TextStyle(
+                                    color: Color.fromARGB(255, 227, 248, 0)),
                               ),
                               Text(
                                 "Fecha: ${agendados[index].fecha}",
-                                style: TextStyle(
-                                    color: Color.fromARGB(255, 200, 169, 201),
+                                style:const TextStyle(
+                                    color: Color.fromARGB(255, 202, 202, 202),
                                     fontWeight: FontWeight.bold),
                               ),
-                              Text("Total:S/.${agendados[index].total}"),
-                              Text("Nombres: ${agendados[index].nombre}"),
-                              Text("Apellidos: ${agendados[index].apellidos}"),
-                              Text("Distrito:${agendados[index].distrito}")
+                              Text("Total:S/.${agendados[index].total}",
+                                style: const TextStyle(
+                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    fontWeight: FontWeight.bold)),
+                              Text("Nombres: ${agendados[index].nombre}",
+                                style:const TextStyle(
+                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    fontWeight: FontWeight.bold)),
+                              Text("Apellidos: ${agendados[index].apellidos}",
+                                style: const TextStyle(
+                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    fontWeight: FontWeight.bold)),
+                              Text("Distrito:${agendados[index].distrito}",
+                                style: const TextStyle(
+                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    fontWeight: FontWeight.bold))
                             ],
                           ),
                         );
                       })
                   : Container(
+                      color: Color.fromARGB(255, 184, 197, 159),
                       child: const Center(
                           child: Text(
                         "No hay pedidos agendados.\n Espera al próximo día.",
