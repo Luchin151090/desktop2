@@ -644,7 +644,7 @@ class _TiemporealState extends State<Tiemporeal> {
                     return Row(
                       children: [
                         Container(
-                          height: 150,
+                          height: 170,
                           width: 150,
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -655,8 +655,9 @@ class _TiemporealState extends State<Tiemporeal> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Pedido Normal :${hoypedidos[index].id}",
+                                "Pedido: ${hoypedidos[index].id}",
                                 style:const TextStyle(
+                                  fontWeight: FontWeight.bold,
                                     color: Color.fromARGB(255, 40, 39, 39)),
                               ),
                               Text(
@@ -859,7 +860,7 @@ class _TiemporealState extends State<Tiemporeal> {
                     return Row(
                       children: [
                         Container(
-                          height: 150,
+                          height: 170,
                           width: 150,
                           padding:const EdgeInsets.all(10),
                           decoration: BoxDecoration(

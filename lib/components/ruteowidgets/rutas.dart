@@ -518,6 +518,7 @@ Future<dynamic> updatePedidoRuta(int ruta_id,String estado) async {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Row(
           children: [
@@ -530,7 +531,7 @@ Future<dynamic> updatePedidoRuta(int ruta_id,String estado) async {
                 ),
                 Container(
                   decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 74, 46, 96),
+                      color: Color.fromARGB(255, 87, 65, 85),
                       borderRadius: BorderRadius.circular(20)),
                   child: IconButton(
                       onPressed: () {},
@@ -551,14 +552,15 @@ Future<dynamic> updatePedidoRuta(int ruta_id,String estado) async {
             ),
           ],
         ),
+        const SizedBox(height: 10,),
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            //color: Color.fromARGB(255, 206, 161, 195)
+            borderRadius: BorderRadius.circular(0),
+           // color: Color.fromARGB(255, 128, 128, 128)
           ),
           width: MediaQuery.of(context).size.width / 8,
-          height: MediaQuery.of(context).size.height / 1.2,
+          height: MediaQuery.of(context).size.height / 1.3,
           child: numeroruta > 0
               ? ListView.builder(
                   padding: const EdgeInsets.all(0),
@@ -574,13 +576,16 @@ Future<dynamic> updatePedidoRuta(int ruta_id,String estado) async {
                       ),
                       child: Center(
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Ruta ${rutasempleado[index].id}'),
-                              IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.visibility)),
+                              Text('Ruta ${rutasempleado[index].id}',style: TextStyle(
+                                fontWeight: FontWeight.bold
+                              ),),
+                              
                               IconButton(
                                   onPressed: () {
                                     showDialog(
@@ -787,33 +792,29 @@ Future<dynamic> updatePedidoRuta(int ruta_id,String estado) async {
                                           );
                                         });
                                   },
-                                  icon: const Icon(Icons.warehouse))
+                                  icon: const Icon(Icons.warehouse,color: Colors.amber,))
                             ],
                           ),
                           // CONDUCTOR-CANTIDAD PEDIDOS
                           Row(
+                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
+                                style: TextStyle(fontWeight: FontWeight.bold),
                                   "Conductor: ${rutasempleado[index].conductorid}"),
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              const Text(
-                                "X",
-                                style: TextStyle(fontSize: 30),
-                              ),
+                              
+                            
                             ],
                           ),
                           // VEHICULO - EDIT - DELETE
                           Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                  "Vehículo: ${rutasempleado[index].vehiculoid}"),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Row(
-                                children: [
+                                  "Vehículo: ${rutasempleado[index].vehiculoid}",style:TextStyle(fontWeight: FontWeight.bold),),
+                              
+                              
                                   IconButton(
                                       onPressed: () async {
                                         // llamando a la función
@@ -1499,7 +1500,7 @@ Future<dynamic> updatePedidoRuta(int ruta_id,String estado) async {
                                               );
                                             });
                                       },
-                                      icon: const Icon(Icons.edit)),
+                                      icon: const Icon(Icons.edit,color: Colors.blue,)),
                                   /*IconButton(
                                       onPressed: () {
                                         showDialog(
@@ -1559,8 +1560,7 @@ Future<dynamic> updatePedidoRuta(int ruta_id,String estado) async {
                                             });
                                       },
                                       icon: const Icon(Icons.delete))*/
-                                ],
-                              )
+                                
                             ],
                           )
                         ],

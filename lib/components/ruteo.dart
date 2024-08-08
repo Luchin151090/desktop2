@@ -8,6 +8,7 @@ import 'package:desktop2/components/ruteowidgets/tiemporeal.dart';
 import 'package:desktop2/components/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -215,6 +216,7 @@ class _RuteoState extends State<Ruteo> {
   String nombre = '';
   String apellidos = '';
   int id = 0;
+  int estadocreado = 0;
 
   Future<dynamic> createRuta(
       empleado_id, conductor_id, vehiculo_id, distancia, tiempo) async {
@@ -228,6 +230,7 @@ class _RuteoState extends State<Ruteo> {
       DateTime now = DateTime.now();
 
       String formateDateTime = now.toString();
+
       await http.post(Uri.parse(api + apiRutaCrear),
           headers: {"Content-type": "application/json"},
           body: jsonEncode({
@@ -238,6 +241,7 @@ class _RuteoState extends State<Ruteo> {
             "tiempo_ruta": 0,
             "fecha_creacion": formateDateTime
           }));
+
       // print("Ruta creada");
     } catch (e) {
       throw Exception("$e");
@@ -279,6 +283,9 @@ class _RuteoState extends State<Ruteo> {
     await createRuta(empleadoId, conductorid, vehiculoid, distancia, tiempo);
     await lastRutaEmpleado(empleadoId);
     await updatePedidoRuta(rutaIdLast, estado);
+    setState(() {
+      
+    });
     //socket.emit('Termine de Updatear', 'si');
   }
 
@@ -309,6 +316,9 @@ class _RuteoState extends State<Ruteo> {
           });
         }
       }
+      setState(() {
+        
+      });
     } catch (e) {
       throw Exception('$e');
     }
@@ -1028,12 +1038,24 @@ class _RuteoState extends State<Ruteo> {
             children: [
               Container(
                   margin: const EdgeInsets.only(left: 50),
-                  child: Text(
-                    "Sistema de Ruteo",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: MediaQuery.of(context).size.height / 35),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Bienvenid@: ${nombre}",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: MediaQuery.of(context).size.height / 35,
+                            color: Color.fromARGB(255, 64, 64, 64)),
+                      ),
+                      Text(
+                        "Sistema de Ruteo",
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 69, 69, 69),
+                            fontWeight: FontWeight.bold,
+                            fontSize: MediaQuery.of(context).size.height / 35),
+                      ),
+                    ],
                   )),
               Row(
                 children: [
@@ -1070,7 +1092,7 @@ class _RuteoState extends State<Ruteo> {
                         decoration: BoxDecoration(
                             //color: Color.fromARGB(255, 198, 172, 181),
                             borderRadius: BorderRadius.circular(20)),
-                        width: MediaQuery.of(context).size.width / 2.2,
+                        width: MediaQuery.of(context).size.width / 2.1,
                         height: MediaQuery.of(context).size.height / 1.2,
                         child: Stack(
                           children: [
@@ -1107,36 +1129,39 @@ class _RuteoState extends State<Ruteo> {
                                     borderRadius: BorderRadius.circular(100)),
                                 child: ElevatedButton(
                                   onPressed: () async {
-                                     showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return const AlertDialog(
-                                                content: Row(
-                                                  children: [
-                                                    CircularProgressIndicator(
-                                                      backgroundColor:
-                                                          Colors.green,
-                                                    ),
-                                                    SizedBox(width: 20),
-                                                    Text("Creando informe...",style: TextStyle(fontWeight: FontWeight.w600),),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          );
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return const AlertDialog(
+                                          content: Row(
+                                            children: [
+                                              CircularProgressIndicator(
+                                                backgroundColor: Colors.green,
+                                              ),
+                                              SizedBox(width: 20),
+                                              Text(
+                                                "Creando informe...",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
                                     await getEmpleadoPedido(
                                         userProvider.user!.id);
                                     await createPdf();
                                     Navigator.pop(context);
                                   },
-                                  child: Text(
+                                  style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all(
+                                          Colors.amber.withOpacity(0.8))),
+                                  child: const Text(
                                     "Informe",
                                     style: TextStyle(color: Colors.white),
                                   ),
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all(
-                                              Colors.amber.withOpacity(0.8))),
                                 ),
                               ),
                             ),
@@ -1223,22 +1248,44 @@ class _RuteoState extends State<Ruteo> {
                                                               padding:
                                                                   const EdgeInsets
                                                                       .all(1),
-                                                              color: const Color
-                                                                  .fromARGB(255,
-                                                                  80, 176, 184),
+                                                              decoration:
+                                                                  BoxDecoration(),
+                                                              //color:  Colors.blue,
                                                               child: Column(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
-                                                                        .center,
+                                                                        .spaceBetween,
                                                                 children: [
                                                                   // CONDUCTORES
+                                                                  Container(
+                                                                      decoration: BoxDecoration(
+                                                                          color: Colors
+                                                                              .white,
+                                                                          border: Border.all(
+                                                                              width: 1,
+                                                                              color: Colors.blue)),
+                                                                      //color: const Color.fromARGB(255, 255, 255, 255),
+                                                                      height: 100,
+                                                                      child: Center(
+                                                                          child: Text(
+                                                                        "Selección de vehiculos/conductores",
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold),
+                                                                      ))),
                                                                   Container(
                                                                     width: MediaQuery.of(context)
                                                                             .size
                                                                             .width /
                                                                         6,
-                                                                    color: Colors
-                                                                        .white,
+                                                                    decoration: BoxDecoration(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        border: Border.all(
+                                                                            width:
+                                                                                1,
+                                                                            color:
+                                                                                Colors.blue)),
                                                                     padding:
                                                                         const EdgeInsets
                                                                             .all(
@@ -1283,8 +1330,14 @@ class _RuteoState extends State<Ruteo> {
                                                                   ),
                                                                   // VEHICULOS-----------
                                                                   Container(
-                                                                    color: Colors
-                                                                        .white,
+                                                                    decoration: BoxDecoration(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        border: Border.all(
+                                                                            width:
+                                                                                1,
+                                                                            color:
+                                                                                Colors.blue)),
                                                                     width: MediaQuery.of(context)
                                                                             .size
                                                                             .width /
@@ -1349,12 +1402,8 @@ class _RuteoState extends State<Ruteo> {
                                                               padding:
                                                                   const EdgeInsets
                                                                       .all(10),
-                                                              color: const Color
-                                                                  .fromARGB(
-                                                                  255,
-                                                                  212,
-                                                                  212,
-                                                                  212),
+                                                              color:
+                                                                  Colors.blue,
                                                               child:
                                                                   GestureDetector(
                                                                 behavior:
@@ -1406,40 +1455,49 @@ class _RuteoState extends State<Ruteo> {
                                                                                 Column(
                                                                               children: [
                                                                                 // NOMBRE DEL DISTRITO DINAMICO
-                                                                                Text(distrito_de_pedido[index]),
-                                                                                Container(
-                                                                                  width: 200,
-                                                                                  height: 200,
-                                                                                  //color: Colors.blue,
-                                                                                  margin: const EdgeInsets.all(5),
-                                                                                  child: ListView.builder(
-                                                                                    itemCount: distrito_pedido['${distrito_de_pedido[index]}']!.length,
-                                                                                    itemBuilder: (BuildContext context, int index2) {
-                                                                                      return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-                                                                                        return Container(
-                                                                                          margin: const EdgeInsets.all(5),
-                                                                                          color: const Color.fromARGB(255, 153, 218, 222),
-                                                                                          child: CheckboxListTile(
-                                                                                            value: distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado,
-                                                                                            onChanged: (bool? value) {
-                                                                                              setState(() {
-                                                                                                print("seleccionando");
+                                                                                Text(
+                                                                                  distrito_de_pedido[index],
+                                                                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                                                                ),
+                                                                               Container(
+  width: 200,
+  height: 200,
+  margin: const EdgeInsets.all(5),
+  child: ListView.builder(
+    itemCount: distrito_pedido['${distrito_de_pedido[index]}']!.length,
+    itemBuilder: (BuildContext context, int index2) {
+      return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+        var pedido = distrito_pedido['${distrito_de_pedido[index]}']![index2];
+        return Container(
+              margin: const EdgeInsets.all(5),
+              color: Colors.yellow,
+              child: CheckboxListTile(
+                value: pedido.seleccionado,
+                onChanged: (bool? value) {
+                  setState(() {
+                    pedido.seleccionado = value!;
+                    if (pedido.seleccionado) {
+                      // Añadir ID si está seleccionado
+                      if (!idPedidosSeleccionados.contains(pedido.id)) {
+                        idPedidosSeleccionados.add(pedido.id);
+                      }
+                    } else {
+                      // Eliminar ID si está deseleccionado
+                      idPedidosSeleccionados.remove(pedido.id);
+                    }
+                    print("Selección actual: ${pedido.seleccionado}");
+                    print("IDs seleccionados: $idPedidosSeleccionados");
+                  });
+                },
+                title: Text("N° ${pedido.id}"),
+                subtitle: Text("${pedido.nombre}"),
+              ),
+            );
+      });
+    },
+  ),
+)
 
-                                                                                                distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado = value!;
-                                                                                                print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado);
-                                                                                                print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].id);
-
-                                                                                                idPedidosSeleccionados.add(distrito_pedido['${distrito_de_pedido[index]}']![index2].id);
-                                                                                              });
-                                                                                            },
-                                                                                            title: Text("N° ${distrito_pedido['${distrito_de_pedido[index]}']?[index2].id}"),
-                                                                                            subtitle: Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].nombre}"),
-                                                                                          ),
-                                                                                        );
-                                                                                      });
-                                                                                    },
-                                                                                  ),
-                                                                                )
                                                                               ],
                                                                             ),
                                                                           ),
@@ -1469,12 +1527,8 @@ class _RuteoState extends State<Ruteo> {
                                                               padding:
                                                                   const EdgeInsets
                                                                       .all(10),
-                                                              color: const Color
-                                                                  .fromARGB(
-                                                                  255,
-                                                                  211,
-                                                                  211,
-                                                                  211),
+                                                              color:
+                                                                  Colors.blue,
                                                               // color: Colors.pink,
                                                               child: FlutterMap(
                                                                 options:
@@ -1515,7 +1569,7 @@ class _RuteoState extends State<Ruteo> {
                                                           child: Row(
                                                             mainAxisAlignment:
                                                                 MainAxisAlignment
-                                                                    .center,
+                                                                    .spaceEvenly,
                                                             crossAxisAlignment:
                                                                 CrossAxisAlignment
                                                                     .center,
@@ -1531,12 +1585,8 @@ class _RuteoState extends State<Ruteo> {
                                                                     10,
                                                                 decoration:
                                                                     BoxDecoration(
-                                                                  color: const Color
-                                                                      .fromARGB(
-                                                                      255,
-                                                                      61,
-                                                                      85,
-                                                                      209),
+                                                                  color: Colors
+                                                                      .blue,
                                                                   borderRadius:
                                                                       BorderRadius
                                                                           .circular(
@@ -1570,46 +1620,56 @@ class _RuteoState extends State<Ruteo> {
                                                                 child:
                                                                     ElevatedButton(
                                                                         onPressed:
-                                                                            () {
-                                                                          showDialog(
+                                                                            () async {
+                                                                          if (selectedConductor?.id != null &&
+                                                                              selectedVehiculo?.id != null) {
+                                                                            showDialog(
                                                                               context: context,
                                                                               builder: (BuildContext context) {
-                                                                                return Dialog(
-                                                                                  child: Container(
-                                                                                    width: 200,
-                                                                                    height: 60,
-                                                                                    child: Center(
-                                                                                      child: Row(
-                                                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                                                        children: [
-                                                                                          TextButton(
-                                                                                              onPressed: () {
-                                                                                                Navigator.pop(context);
-                                                                                              },
-                                                                                              child: const Text("Cancelar")),
-                                                                                          TextButton(
-                                                                                              onPressed: () async {
-                                                                                                print(selectedConductor!.id);
-                                                                                                print(selectedVehiculo!.id);
-                                                                                                await createRuta(1, selectedConductor!.id, selectedVehiculo!.id, 0, 0);
-                                                                                              },
-                                                                                              child: const Text("Confirmar"))
-                                                                                        ],
+                                                                                return const AlertDialog(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      CircularProgressIndicator(
+                                                                                        backgroundColor: Colors.green,
                                                                                       ),
-                                                                                    ),
+                                                                                      SizedBox(width: 20),
+                                                                                      Text("Creando..."),
+                                                                                    ],
                                                                                   ),
                                                                                 );
-                                                                              });
+                                                                              },
+                                                                            );
+                                                                            await createRuta(
+                                                                                id,
+                                                                                selectedConductor!.id,
+                                                                                selectedVehiculo!.id,
+                                                                                0,
+                                                                                0);
+                                                                            Navigator.pop(context);
+                                                                          } else {
+                                                                            showDialog(
+                                                                                context: context,
+                                                                                builder: (BuildContext context) {
+                                                                                  return AlertDialog(
+                                                                                    backgroundColor: const Color.fromARGB(255, 243, 215, 134),
+                                                                                    title: const Text("Alerta"),
+                                                                                    content: const Text("Debes seleccionar el conductor y vehículo antes de crear."),
+                                                                                    actions: [
+                                                                                      TextButton(
+                                                                                          onPressed: () {
+                                                                                            Navigator.pop(context);
+                                                                                          },
+                                                                                          child: const Text("OK"))
+                                                                                    ],
+                                                                                  );
+                                                                                });
+                                                                          }
                                                                         },
                                                                         style: ButtonStyle(
                                                                             elevation: WidgetStateProperty.all(
                                                                                 6),
-                                                                            backgroundColor: WidgetStateProperty.all(const Color.fromARGB(
-                                                                                255,
-                                                                                131,
-                                                                                131,
-                                                                                131))),
+                                                                            backgroundColor: WidgetStateProperty.all(Colors
+                                                                                .blue)),
                                                                         child:
                                                                             const Text(
                                                                           "Crear",
@@ -1654,7 +1714,11 @@ class _RuteoState extends State<Ruteo> {
                                                                           Colors
                                                                               .white)),
                                                               child: const Text(
-                                                                  "Cerrar"),
+                                                                "Cerrar",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
                                                             ),
                                                           ),
                                                           const SizedBox(
@@ -1672,69 +1736,64 @@ class _RuteoState extends State<Ruteo> {
                                                                 ElevatedButton(
                                                                     onPressed:
                                                                         () async {
-                                                                      showDialog(
-                                                                        context:
-                                                                            context,
-                                                                        builder:
-                                                                            (BuildContext
-                                                                                context) {
-                                                                          return AlertDialog(
-                                                                            content:
-                                                                                Row(
-                                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                                              children: [
-                                                                                TextButton(
-                                                                                    onPressed: () {
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    child: const Text("Cancelar")),
-                                                                                const SizedBox(
-                                                                                  width: 10,
-                                                                                ),
-                                                                                TextButton(
-                                                                                    onPressed: () async {
-                                                                                      showDialog(
-                                                                                        context: context,
-                                                                                        builder: (BuildContext context) {
-                                                                                          return const AlertDialog(
-                                                                                            content: Row(
-                                                                                              children: [
-                                                                                                CircularProgressIndicator(
-                                                                                                  backgroundColor: Colors.green,
-                                                                                                ),
-                                                                                                SizedBox(width: 20),
-                                                                                                Text("Cargando..."),
-                                                                                              ],
-                                                                                            ),
-                                                                                          );
-                                                                                        },
-                                                                                      );
-                                                                                      print("iid.........s");
-                                                                                      print(selectedConductor!.id);
-                                                                                      print(selectedVehiculo!.id);
-                                                                                      await crearobtenerYactualizarRuta(1, selectedConductor!.id, selectedVehiculo!.id, 0, 0, 'en proceso');
-                                                                                      Navigator.pop(context);
-                                                                                      Navigator.pop(context);
-
-                                                                                      print("holiiiii");
-                                                                                    },
-                                                                                    child: const Text("Continuar")),
-                                                                              ],
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                      );
+                                                                      if (selectedConductor?.id != null &&
+                                                                          selectedVehiculo?.id !=
+                                                                              null &&
+                                                                          idPedidosSeleccionados
+                                                                              .isNotEmpty) {
+                                                                                showDialog(
+                                                                              context: context,
+                                                                              builder: (BuildContext context) {
+                                                                                return const AlertDialog(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      CircularProgressIndicator(
+                                                                                        backgroundColor: Colors.green,
+                                                                                      ),
+                                                                                      SizedBox(width: 20),
+                                                                                      Text("Creando..."),
+                                                                                    ],
+                                                                                  ),
+                                                                                );
+                                                                              },
+                                                                            );
+                                                                        await crearobtenerYactualizarRuta(
+                                                                            id,
+                                                                            selectedConductor!.id,
+                                                                            selectedVehiculo!.id,
+                                                                            0,
+                                                                            0,
+                                                                            'en proceso');
+                                                                            
+                                                                            Navigator.pop(context);
+                                                                        
+                                                                        
+                                                                      } else {
+                                                                        showDialog(
+                                                                          context:
+                                                                              context,
+                                                                          builder:
+                                                                              (BuildContext context) {
+                                                                            return  AlertDialog(
+                                                                                backgroundColor: Color.fromARGB(255, 244, 219, 135),
+                                                                                title: Text("Advertencia"),
+                                                                                content: Text("Debes seleccionar conductor, vehículo y al menos un pedido para crear."),
+                                                                                actions: [
+                                                                                  TextButton(onPressed: (){
+                                                                                    Navigator.pop(context);
+                                                                                  }, child: Text("OK"))
+                                                                                ],);
+                                                                          },
+                                                                        );
+                                                                      }
                                                                     },
                                                                     style: ButtonStyle(
                                                                         elevation:
                                                                             WidgetStateProperty.all(
                                                                                 7),
-                                                                        backgroundColor: WidgetStateProperty.all(const Color
-                                                                            .fromARGB(
-                                                                            255,
-                                                                            98,
-                                                                            69,
-                                                                            229))),
+                                                                        backgroundColor:
+                                                                            WidgetStateProperty.all(Colors
+                                                                                .blue)),
                                                                     child:
                                                                         const Text(
                                                                       "Crear",

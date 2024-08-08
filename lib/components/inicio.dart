@@ -53,7 +53,8 @@ class _MenuState extends State<Menu> {
           NavigationRail(
             backgroundColor: Color.fromARGB(255, 39, 38, 41),
             selectedIndex: _selectedIndex,
-            minWidth: 100,
+            
+            minWidth: 80,
             onDestinationSelected: (index) {
               
                 setState(() {
@@ -61,30 +62,37 @@ class _MenuState extends State<Menu> {
                 });
               
             },
-            labelType: NavigationRailLabelType.all,
+            labelType: NavigationRailLabelType.none,
+            unselectedLabelTextStyle:const TextStyle(
+              color: Colors.grey
+            ),
             selectedLabelTextStyle: const TextStyle(
-              color: Color.fromARGB(255, 252, 235, 0)
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 255, 255, 255)
             ),
             elevation: 5,
-            leading: Container(
+           /* leading: Container(
                   //margin: EdgeInsets.only(top: 20),
-                  width: 50,
-                  height: 50,
+                  width: 35,
+                  height: 35,
                   decoration: BoxDecoration(
                      color: Colors.white,
                      borderRadius: BorderRadius.circular(50)
                   ),
-                  child: IconButton(onPressed: (){
-                  showDialog(context: context, builder: (BuildContext context){
-                    return Dialog(
-                      child: Container(
-                        child: Text("Nombre "),
-                      ),
-                    );
-                  });
-                  },
-                   icon: Icon(Icons.person)),
-                ),
+                  child: Center(
+                    child: IconButton(onPressed: (){
+                    showDialog(context: context, builder: (BuildContext context){
+                      return AlertDialog(
+                        title: Text("Nombre"),
+                        actions: [
+                          TextButton(onPressed: (){}, child: Text("OK"))
+                        ],
+                      );
+                    });
+                    },
+                     icon: Icon(Icons.person,color: Colors.black,size: 20,)),
+                  ),
+                ),*/
             trailing: Expanded(child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

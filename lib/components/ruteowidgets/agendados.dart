@@ -411,7 +411,7 @@ class _AgendadosState extends State<Agendados> {
                         );
                       })
                   : Container(
-                      color: Color.fromARGB(255, 184, 197, 159),
+                      color: Color.fromARGB(255, 107, 107, 107),
                       child: const Center(
                           child: Text(
                         "No hay pedidos agendados.\n Espera al próximo día.",
