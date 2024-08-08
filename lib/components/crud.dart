@@ -319,8 +319,8 @@ class _CrudState extends State<Crud> {
     var res = await http.get(
         Uri.parse(apiUrl + apiConductorAdmin + '/' + idadmin.toString()),
         headers: {"Content-type": "application/json"});
-    print("Entra a la funcion de aqui ------------");
-    print(apiUrl + apiConductorAdmin + '/' + idadmin.toString());
+    //print("Entra a la funcion de aqui ------------");
+    //print(apiUrl + apiConductorAdmin + '/' + idadmin.toString());
     try {
       var data = json.decode(res.body);
       List<Conductor> tempConductor = data.map<Conductor>((data) {

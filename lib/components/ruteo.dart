@@ -1,17 +1,24 @@
+import 'dart:io';
+
 import 'package:desktop2/components/distritos/distritos.dart';
 import 'package:desktop2/components/provider/marcador.dart';
 import 'package:desktop2/components/ruteowidgets/agendados.dart';
 import 'package:desktop2/components/ruteowidgets/rutas.dart';
 import 'package:desktop2/components/ruteowidgets/tiemporeal.dart';
+import 'package:desktop2/components/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class VentasEmpleado {
   int? costo_entregados;
@@ -203,6 +210,11 @@ class _RuteoState extends State<Ruteo> {
   int idVehiculo = 0;
   int rutaIdLast = 0;
   List<int> idPedidosSeleccionados = [];
+  List<Empleadopedido> empleadopedido = [];
+  int informe = 0;
+  String nombre = '';
+  String apellidos = '';
+  int id = 0;
 
   Future<dynamic> createRuta(
       empleado_id, conductor_id, vehiculo_id, distancia, tiempo) async {
@@ -297,6 +309,34 @@ class _RuteoState extends State<Ruteo> {
           });
         }
       }
+    } catch (e) {
+      throw Exception('$e');
+    }
+  }
+
+  Future<dynamic> getEmpleadoPedido(int empleadoid) async {
+    // print("${api}+$apiEmpleadoPedidos+${empleadoid.toString()}");
+    var res = await http.get(
+        Uri.parse(api + apiEmpleadoPedidos + empleadoid.toString()),
+        headers: {"Content-type": "application/json"});
+    try {
+      var data = json.decode(res.body);
+      List<Empleadopedido> tempEmpleadopedido =
+          data.map<Empleadopedido>((data) {
+        return Empleadopedido(
+            idruta: data['idruta'],
+            npedido: data['npedido'],
+            estado: data['estado'],
+            tipo: data['tipo'],
+            fecha: data['fecha'],
+            total: data['total']?.toDouble() ?? 0.0,
+            nombres: data['nombres'],
+            vehiculo: data['vehiculo']);
+      }).toList();
+      setState(() {
+        empleadopedido = tempEmpleadopedido;
+        //  print("$tempEmpleadopedido");
+      });
     } catch (e) {
       throw Exception('$e');
     }
@@ -705,6 +745,254 @@ class _RuteoState extends State<Ruteo> {
       }
     }
   }
+//METODOS DEL INFORME PDF
+
+  Future<File> saveDocument(
+      {required String name, required pw.Document pdf}) async {
+    final bytes = await pdf.save();
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/$name');
+
+    await file.writeAsBytes(bytes);
+    return file;
+  }
+
+  Future<void> openDocument(File file) async {
+    await OpenFile.open(file.path);
+  }
+
+//CREAR PDF INFORME DEL PRIMER CODIGO
+
+  Future<File> createPdf() async {
+    // NÚMERO DE INFORME
+    informe++;
+
+    final pdf = pw.Document();
+
+    pdf.addPage(pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      margin:
+          const pw.EdgeInsets.only(top: 20, bottom: 20, left: 20, right: 20),
+      build: (context) => [
+/*
+        pw.Column(children: [
+          pw.Center(
+              child: pw.Container(
+                  height: 30,
+                  decoration: pw.BoxDecoration(
+                      borderRadius: pw.BorderRadius.circular(20),
+                      color: PdfColor.fromInt(Colors.amber.value)),
+                  child: pw.Center(
+                      child: pw.Text("Informe N° ${informe}".toUpperCase(),
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold,
+                              fontSize: 15,
+                              color: PdfColor.fromInt(
+                                  const Color.fromARGB(255, 12, 39, 62)
+                                      .value)))))),
+        ]),
+        // ESPACIO
+        pw.SizedBox(height: 30),
+
+        pw.Container(
+            width: 200,
+            height: 80,
+            padding: pw.EdgeInsets.all(10),
+            decoration: pw.BoxDecoration(
+                borderRadius: pw.BorderRadius.circular(10),
+                color: PdfColor.fromInt(Colors.blue.value)),
+            child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text("ID: ${id}",
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromInt(Colors.white.value))),
+                  pw.Text("Nombres: ${nombre}",
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromInt(Colors.white.value))),
+                  pw.Text("Apellidos: ${apellidos}",
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromInt(Colors.white.value))),
+                  pw.Text("Fecha: ${now.day}/${now.month}/${now.year}",
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromInt(Colors.white.value))),
+                ])),
+        pw.Container(
+            width: 250,
+            height: 120,
+            padding: pw.EdgeInsets.all(10),
+            decoration: pw.BoxDecoration(
+                borderRadius: pw.BorderRadius.circular(20),
+                color: PdfColor.fromInt(Colors.teal.value)),
+            child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                      "MONTO ENTREGADOS: S/.${ventasempleado?.costo_entregados}.00",
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromInt(Colors.purple.value))),
+                  pw.Text("ESTADO DE PEDIDOS",
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromInt(Colors.white.value))),
+                  pw.Text("Pendiente: ${ventasempleado?.pendiente}",
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromInt(Colors.white.value))),
+                  pw.Text("Proceso: ${ventasempleado?.proceso}",
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromInt(Colors.white.value))),
+                  pw.Text("Entregado: ${ventasempleado?.entregado}",
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromInt(Colors.white.value))),
+                  pw.Text("Truncado: ${ventasempleado?.truncado}",
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromInt(Colors.white.value))),
+                ])),
+        //ESPACIO
+        pw.SizedBox(height: 30),
+
+*/
+
+        pw.Container(
+          child: pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    "Informe N° ${informe} - ${now.year}"
+                        .toUpperCase(), //-2024",
+                    style: pw.TextStyle(
+                      fontSize: 20,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColor.fromInt(
+                          const Color.fromARGB(255, 12, 39, 62).value),
+                    ),
+                  ),
+                  pw.SizedBox(height: 5),
+                  pw.Text(
+                    "Empleado: ${id}",
+                    style: pw.TextStyle(
+                      fontSize: 14,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColor.fromInt(
+                          const Color.fromARGB(255, 12, 39, 62).value),
+                    ),
+                  ),
+                  pw.SizedBox(height: 5),
+                  pw.Text(
+                    "Zona de Trabajo: Arequipa".toUpperCase(),
+                    style: pw.TextStyle(
+                      fontSize: 14,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColor.fromInt(
+                          const Color.fromARGB(255, 12, 39, 62).value),
+                    ),
+                  ),
+                  pw.SizedBox(height: 5),
+                  pw.Text(
+                    "Fecha: ${now.day}/${now.month}/${now.year}",
+                    style: pw.TextStyle(
+                      fontSize: 14,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColor.fromInt(
+                          const Color.fromARGB(255, 12, 39, 62).value),
+                    ),
+                  ),
+                ],
+              ),
+              pw.Padding(
+                padding: const pw.EdgeInsets.only(right: 20),
+                child: pw.Image(
+                  pw.MemoryImage(
+                    File('lib/imagenes/logo_final_2.png').readAsBytesSync(),
+                  ),
+                  width: 100,
+                  height: 100,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        //TABLA
+        /* pw.Table(border: pw.TableBorder.all(), children: [
+          pw.TableRow(children: [
+            pw.Text("Cantidad de Pedido".toUpperCase()),
+            pw.Text("Monto".toUpperCase()),
+            pw.Text("Unidad Móvil".toUpperCase()),
+          ]),
+          for (var i = 0; i < pedidosget.length; i++)
+            pw.TableRow(children: [
+              pw.Text("Pedido n° ${pedidosget[i].id}".toUpperCase()),
+              pw.Text("Estado: ${pedidosget[i].estado}".toUpperCase()),
+              pw.Text("Unidad Móvil".toUpperCase()),
+            ]),
+          pw.TableRow(children: [
+            pw.Container(
+                height: 20,
+                width: 20,
+                child: pw.ListView.builder(
+                    itemCount: 10,
+                    itemBuilder: (context, index) {
+                      return pw.Column(children: [pw.Text("asd")]);
+                    })),
+          ])
+        ])*/
+        pw.Table(
+          border: pw.TableBorder.all(),
+          children: [
+            pw.TableRow(
+              children: [
+                pw.Text("N° Registro", style: pw.TextStyle(fontSize: 12)),
+                pw.Text("Ruta N°"),
+                pw.Text("Pedido N°"),
+                pw.Text("Fecha"),
+                pw.Text("Tipo de Pedido".toUpperCase()),
+                pw.Text("Estado del Pedido".toUpperCase()),
+                pw.Text("Monto total".toUpperCase()),
+                pw.Text("Conductor".toUpperCase()),
+                pw.Text("Unidad Móvil".toUpperCase())
+              ],
+            ),
+            for (var i = 0; i < empleadopedido.length; i++)
+              pw.TableRow(
+                children: [
+                  pw.Text("${i + 1}"), //n registro
+                  pw.Text("${empleadopedido[i].idruta}"), //id ruta
+                  pw.Text("${empleadopedido[i].npedido}"),
+                  pw.Text("${empleadopedido[i].fecha}"),
+                  pw.Text("${empleadopedido[i].tipo}"), //tipo
+                  pw.Text("${empleadopedido[i].estado}".toUpperCase()), //estado
+                  pw.Text("S/.${empleadopedido[i].total}"), //monto total
+                  pw.Text("${empleadopedido[i].nombres}"),
+                  pw.Text("${empleadopedido[i].vehiculo}")
+                ],
+              ),
+          ],
+        ),
+      ],
+    ));
+
+    final savedFile = await saveDocument(
+        name: 'informe_${now.day}-${now.month}-${now.year}', pdf: pdf);
+    await openDocument(savedFile);
+
+    return savedFile;
+    /*return saveDocument(
+      name:'informe${1}',pdf:pdf
+    );*/
+  }
 
   @override
   void initState() {
@@ -725,6 +1013,10 @@ class _RuteoState extends State<Ruteo> {
   @override
   Widget build(BuildContext context) {
     final marcadorProvider = Provider.of<MarcadorProvider>(context);
+    final userProvider = context.watch<UserProvider>();
+    nombre = userProvider.user!.nombre;
+    apellidos = userProvider.user!.apellidos;
+    id = userProvider.user!.id;
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 156, 156, 156),
       body: Container(
@@ -804,6 +1096,31 @@ class _RuteoState extends State<Ruteo> {
                                   ],
                                 ),
                               ],
+                            ),
+                            Positioned(
+                              left: 100,
+                              top: 10,
+                              child: Container(
+                                height: 100,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(100)),
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await getEmpleadoPedido(
+                                        userProvider.user!.id);
+                                    await createPdf();
+                                  },
+                                  child: Text(
+                                    "Informe",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              Colors.amber.withOpacity(0.8))),
+                                ),
+                              ),
                             ),
                             Positioned(
                                 top: 10,
@@ -1236,8 +1553,9 @@ class _RuteoState extends State<Ruteo> {
                                                                     ElevatedButton(
                                                                         onPressed:
                                                                             () {
-                                                                              showDialog(context: context,
-                                                                               builder: (BuildContext context){
+                                                                          showDialog(
+                                                                              context: context,
+                                                                              builder: (BuildContext context) {
                                                                                 return Dialog(
                                                                                   child: Container(
                                                                                     width: 200,
@@ -1247,27 +1565,25 @@ class _RuteoState extends State<Ruteo> {
                                                                                         crossAxisAlignment: CrossAxisAlignment.center,
                                                                                         mainAxisAlignment: MainAxisAlignment.center,
                                                                                         children: [
-                                                                                          TextButton(onPressed: (){
-                                                                                            Navigator.pop(context);
-                                                                                          },
-                                                                                           child:const Text("Cancelar")),
-                                                                                           
-                                                                                          TextButton(onPressed: ()async{
-                                                                                      print(selectedConductor!.id);
-                                                                                          print(selectedVehiculo!.id);
-                                                                                            await createRuta(1,selectedConductor!.id,
-                                                                                            selectedVehiculo!.id,
-                                                                                             0, 0);
-                                                                                          },
-                                                                                           child:const Text("Confirmar"))
+                                                                                          TextButton(
+                                                                                              onPressed: () {
+                                                                                                Navigator.pop(context);
+                                                                                              },
+                                                                                              child: const Text("Cancelar")),
+                                                                                          TextButton(
+                                                                                              onPressed: () async {
+                                                                                                print(selectedConductor!.id);
+                                                                                                print(selectedVehiculo!.id);
+                                                                                                await createRuta(1, selectedConductor!.id, selectedVehiculo!.id, 0, 0);
+                                                                                              },
+                                                                                              child: const Text("Confirmar"))
                                                                                         ],
                                                                                       ),
                                                                                     ),
                                                                                   ),
                                                                                 );
-                                                                               });
-                                                                               
-                                                                            },
+                                                                              });
+                                                                        },
                                                                         style: ButtonStyle(
                                                                             elevation: WidgetStateProperty.all(
                                                                                 6),
@@ -1347,13 +1663,16 @@ class _RuteoState extends State<Ruteo> {
                                                                           return AlertDialog(
                                                                             content:
                                                                                 Row(
-                                                                                  mainAxisAlignment: MainAxisAlignment.center,
-
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
-                                                                                TextButton(onPressed: () {
-                                                                                  Navigator.pop(context);
-                                                                                }, child:const Text("Cancelar")),
-                                                                                const SizedBox(width: 10,),
+                                                                                TextButton(
+                                                                                    onPressed: () {
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    child: const Text("Cancelar")),
+                                                                                const SizedBox(
+                                                                                  width: 10,
+                                                                                ),
                                                                                 TextButton(
                                                                                     onPressed: () async {
                                                                                       showDialog(
@@ -1381,7 +1700,7 @@ class _RuteoState extends State<Ruteo> {
 
                                                                                       print("holiiiii");
                                                                                     },
-                                                                                    child:const Text("Continuar")),
+                                                                                    child: const Text("Continuar")),
                                                                               ],
                                                                             ),
                                                                           );

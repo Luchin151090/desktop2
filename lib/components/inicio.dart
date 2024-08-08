@@ -1,170 +1,137 @@
 import 'package:desktop2/components/login.dart';
 import 'package:desktop2/components/ruteo.dart';
-import 'package:desktop2/components/tienda.dart';
+import 'package:desktop2/components/tiendaPato.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Menu(),
+    );
+  }
+}
 
 class Menu extends StatefulWidget {
-  const Menu({super.key});
-
   @override
-  State<Menu> createState() => _MenuState();
+  _MenuState createState() => _MenuState();
 }
 
 class _MenuState extends State<Menu> {
-  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    Ruteo(),
+    Tienda(),
+  ];
+
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Dialog Title'),
+          content: Text('This is a dialog.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Row(
-          children: [
-            Container(
-              width: 80,
-              color: Color.fromARGB(255, 44, 41, 52),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 30),
-                  // USUARIO
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            barrierColor:
-                                const Color.fromARGB(255, 241, 204, 204)
-                                    .withOpacity(0.35),
-                            builder: (BuildContext context) {
-                              return Dialog(
-                                backgroundColor: Colors.white,
-                                surfaceTintColor:const Color.fromARGB(255, 160, 148, 190),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20)),
-                                  padding: const EdgeInsets.all(15),
-                                  height:
-                                      MediaQuery.of(context).size.height / 3,
-                                  width: MediaQuery.of(context).size.width / 4,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Center(
-                                          child: Text("Información Personal")),
-                                      const SizedBox(
-                                        height: 50,
-                                      ),
-                                     const Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Nombres: xxx-xxx"),
-                                          Text("Código empleado: XDFG"),
-                                          Text("Zona Trabajo: Arequipa")
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 49,
-                                      ),
-                                      Center(
-                                        child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child:const Text("Cerrar")),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              );
-                            });
-                      },
-                      icon:
-                          const Icon(Icons.person_outline_sharp, color: Colors.black),
-                    ),
+      body: Row(
+        children: [
+          NavigationRail(
+            backgroundColor: Color.fromARGB(255, 39, 38, 41),
+            selectedIndex: _selectedIndex,
+            minWidth: 100,
+            onDestinationSelected: (index) {
+              
+                setState(() {
+                  _selectedIndex = index;
+                });
+              
+            },
+            labelType: NavigationRailLabelType.all,
+            selectedLabelTextStyle: const TextStyle(
+              color: Color.fromARGB(255, 252, 235, 0)
+            ),
+            elevation: 5,
+            leading: Container(
+                  //margin: EdgeInsets.only(top: 20),
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                     color: Colors.white,
+                     borderRadius: BorderRadius.circular(50)
                   ),
-                  const SizedBox(height: 30),
-                  //RUTEO
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        _navigatorKey.currentState?.pushReplacement(
-                          CupertinoPageRoute(builder: (context) => const Ruteo()),
-                        );
-                      },
-                      icon:const Icon(Icons.drive_eta_outlined),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  // TIENDITA
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        _navigatorKey.currentState?.pushReplacement(
-                          CupertinoPageRoute(builder: (context) => const Tienda()),
-                        );
-                      },
-                      icon:const Icon(Icons.storefront_outlined),
-                    ),
-                  ),
-                  // SALIR
-                  Expanded(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Login1()),
-                              );
-                            },
-                            icon:const Icon(Icons.exit_to_app)),
+                  child: IconButton(onPressed: (){
+                  showDialog(context: context, builder: (BuildContext context){
+                    return Dialog(
+                      child: Container(
+                        child: Text("Nombre "),
                       ),
-                      const SizedBox(
-                        height: 30,
-                      )
-                    ],
-                  ))
-                ],
+                    );
+                  });
+                  },
+                   icon: Icon(Icons.person)),
+                ),
+            trailing: Expanded(child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(bottom: 20),
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                     color: Colors.white,
+                     borderRadius: BorderRadius.circular(50)
+                  ),
+                  child: IconButton(onPressed: (){
+                  
+                   Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Login1(),
+                            ),
+                          );
+                  },
+                   icon: Icon(Icons.exit_to_app)),
+                )
+              ],
+            )),
+            destinations: const [
+              
+              NavigationRailDestination(
+                padding: EdgeInsets.all(8),
+                icon: Icon(Icons.drive_eta),
+                label: Text('Ruteo'),
               ),
-            ),
-            Expanded(
-              child: Navigator(
-                key: _navigatorKey,
-                onGenerateRoute: (routeSettings) {
-                  return CupertinoPageRoute(
-                    builder: (context) => const Ruteo(),
-                  );
-                },
+              NavigationRailDestination(
+                padding: EdgeInsets.all(8),
+                icon: Icon(Icons.storefront),
+                label: Text('Tienda'),
               ),
-            ),
-          ],
-        ),
+             
+            ],
+            indicatorShape:const CircleBorder(), // Usa CircleBorder para forma circular
+            indicatorColor: const Color.fromARGB(255, 255, 255, 255), // Color del indicador
+           // backgroundColor: Colors.grey[200],
+          ),
+          Expanded(
+            child: _pages[_selectedIndex]
+                 // Handle case when index is out of range
+          ),
+        ],
       ),
     );
   }

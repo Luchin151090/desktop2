@@ -174,10 +174,26 @@ class _RutasState extends State<Rutas> {
   String totalventas = '/api/totalventas_empleado/';
   String allrutasempleado = '/api/allrutas_empleado/';
   String rutapedidos = '/api/ruta/';
+  String updatedeletepedido ='/api/revertirpedido/';
   final ScrollController _scrollController3 = ScrollController();
   List<Ruta> rutasempleado = [];
   int numeroruta = 0;
+  String mensajedelete = "No procesa";
   List<PedidoRuta> pedidosruta = [];
+
+
+
+  List<Pedido> hoypedidos = [];
+  List<Pedido> hoyexpress = [];
+  List<Pedido> agendados = [];
+    late DateTime fechaparseadas;
+  late DateTime fechaHoyruta;
+  DateTime now = DateTime.now();
+  //LISTAS Y VARIABLES
+  List<Pedido> pedidosget = [];
+  List<Pedido> pedidoSeleccionado = [];
+
+
 
   @override
   void dispose() {
@@ -191,18 +207,179 @@ class _RutasState extends State<Rutas> {
     getConductores();
     getVehiculos();
     getallrutasempleado();
+    getPedidos();
+  }
+Future<dynamic> updatePedidoRuta(int ruta_id,String estado) async {
+  try{
+    /*print("dentro de update ruta");
+    print(ruta_id);
+    print(idPedidosSeleccionados.length);*/
+    for (var i = 0; i < idPedidosSeleccionados.length; i++) {
+     /* print("iterando");
+      print(idPedidosSeleccionados[i]);*/
+      await http.put(
+          Uri.parse(
+              api + apiUpdateRuta + '/' + idPedidosSeleccionados[i].toString()),
+          headers: {"Content-type": "application/json"},
+          body: jsonEncode({"ruta_id": ruta_id, "estado": estado}));
+    }
+  }
+  catch(error){
+    throw Exception("$error");
+  }
+    
+  
+}
+
+  Future<dynamic> getPedidos() async {
+    try {
+      //print("---------dentro ..........................get pedidos");
+      //print(apipedidos);
+      SharedPreferences empleadoShare = await SharedPreferences.getInstance();
+
+      var empleadoIDs = 1; //empleadoShare.getInt('empleadoID');
+      var res = await http.get(
+          Uri.parse(api + apipedidos + '/' + empleadoIDs.toString()),
+          headers: {"Content-type": "application/json"});
+
+      if (res.statusCode == 200) {
+        var data = json.decode(res.body);
+        List<Pedido> tempPedido = (data as List).map<Pedido>((data) {
+          return Pedido(
+              id: data['id'],
+              ruta_id: data['ruta_id'] ?? 0,
+              subtotal: data['subtotal']?.toDouble() ?? 0.0,
+              descuento: data['descuento']?.toDouble() ?? 0.0,
+              total: data['total']?.toDouble() ?? 0.0,
+              fecha: data['fecha'],
+              tipo: data['tipo'],
+              distrito: data['distrito'],
+              estado: data['estado'],
+              latitud: data['latitud']?.toDouble() ?? 0.0,
+              longitud: data['longitud']?.toDouble() ?? 0.0,
+              nombre: data['nombre'] ?? '',
+              apellidos: data['apellidos'] ?? '',
+              telefono: data['telefono'] ?? '');
+        }).toList();
+
+        if (mounted) {
+          setState(() {
+            pedidosget = tempPedido;
+            //print("---pedidos get");
+            //print(pedidosget.length);
+
+            // TRAIGO LOS DISTRITOS DE LOS PEDIDOS DE AYER - SOLO LOS DE AYER
+            for (var j = 0; j < pedidosget.length; j++) {
+              fechaparseadas = DateTime.parse(pedidosget[j].fecha.toString());
+              if (pedidosget[j].estado == 'pendiente') {
+                if (pedidosget[j].tipo == 'normal' ||
+                    pedidosget[j].tipo == 'express') {
+                  if (fechaparseadas.day != now.day) {
+                    distritosSet.add(pedidosget[j].distrito.toString());
+                  }
+                }
+              }
+            }
+
+            // Convertir el Set a una lista
+            distrito_de_pedido = distritosSet.toList();
+            //print("distritos");
+            //print(distrito_de_pedido);
+
+            // AHORA ITERO EN TODOS LOS PEDIDOS Y LO RELACIONO SOLO CON LOS DISTRITOS QUE OBTUVE
+            for (var x = 0; x < distrito_de_pedido.length; x++) {
+              //print(distrito_de_pedido[x]);
+              for (var j = 0; j < pedidosget.length; j++) {
+                fechaparseadas = DateTime.parse(pedidosget[j].fecha.toString());
+                if (pedidosget[j].estado == 'pendiente') {
+                  if (pedidosget[j].tipo == 'normal' ||
+                      pedidosget[j].tipo == 'express') {
+                    //    print("----------TIPO");
+                    // print(pedidosget[j].tipo);
+                    if (fechaparseadas.day != now.day) {
+                      if (distrito_de_pedido[x] == pedidosget[j].distrito) {
+                        nuevopedidodistrito.add(pedidosget[j]);
+                        /* print("nuevo pedido distrito ID:");
+                        print(pedidosget[j].id);
+                        print(pedidosget[j].distrito);
+                        print(pedidosget[j].nombre);
+                        print(pedidosget[j].apellidos);
+                        print(pedidosget[j].tipo);
+                        print(pedidosget[j].total);*/
+                      }
+                    }
+                  }
+                }
+              }
+              setState(() {
+                distrito_pedido['${distrito_de_pedido[x]}'] =
+                    nuevopedidodistrito;
+                nuevopedidodistrito = [];
+              });
+              //print("tamaño de mapa");
+              //print(distrito_pedido['${distrito_de_pedido[x]}']?.length);
+            }
+
+           /* int count = 1;
+            for (var i = 0; i < pedidosget.length; i++) {
+              fechaparseadas = DateTime.parse(pedidosget[i].fecha.toString());
+              if (pedidosget[i].estado == 'pendiente') {
+                if (pedidosget[i].tipo == 'normal' ||
+                    pedidosget[i].tipo == 'express') {
+                  if (fechaparseadas.day != now.day) {
+                    LatLng coordGET = LatLng(
+                        (pedidosget[i].latitud ?? 0.0) + (0.000001 * count),
+                        (pedidosget[i].longitud ?? 0.0) + (0.000001 * count));
+                    puntosget.add(coordGET);
+                    pedidosget[i].latitud = coordGET.latitude;
+                    pedidosget[i].longitud = coordGET.longitude;
+                    agendados.add(pedidosget[i]);
+                    //print("......AGENDADOS");
+                    //print(agendados);
+                  }
+                }
+              }
+              count++;
+            }*/
+
+            //marcadoresPut("agendados");
+            setState(() {
+              number = agendados.length;
+            });
+            //print("ageng tama");
+            //print(number);
+          });
+        }
+      }
+    } catch (e) {
+      throw Exception('Error $e');
+    }
   }
 
+  Future<dynamic>deleterevertir(int idpedido) async{
+    try{
+      var res = await http.delete(Uri.parse(api+updatedeletepedido+idpedido.toString()),
+      headers: {"Content-type":"application/json"});
+      if(res.statusCode==200){
+        setState(() {
+          mensajedelete ="Pedido revertido o eliminado";
+        });
+      }
+    }
+    catch(error){
+      throw Exception("$error");
+    }
+  }
   Future<dynamic> getpedidosruta(rutaid) async {
-    print("-----ruta---");
-    print(rutaid);
+    //print("-----ruta---");
+    //print(rutaid);
     try {
       var res = await http.get(Uri.parse(api + rutapedidos + rutaid.toString()),
           headers: {"Content-type": "application/json"});
       if (res.statusCode == 200) {
         var data = json.decode(res.body);
-        print("rutita--------------");
-        print(data);
+        //print("rutita--------------");
+        //print(data);
         List<PedidoRuta> tempPedido = data.map<PedidoRuta>((data) {
           return PedidoRuta(
               id: data['pedido_id'],
@@ -234,8 +411,8 @@ class _RutasState extends State<Rutas> {
 
       if (res.statusCode == 200) {
         var responseData = json.decode(res.body);
-        print("rutass data");
-        print(responseData['data']);
+       // print("rutass data");
+        //print(responseData['data']);
 
         // Asegúrate de que responseData['data'] sea una lista antes de usar map
         if (responseData['data'] is List) {
@@ -274,8 +451,8 @@ class _RutasState extends State<Rutas> {
     try {
       SharedPreferences empleadoShare = await SharedPreferences.getInstance();
       var empleadoIDs = 1; //empleadoShare.getInt('empleadoID');
-      print("El empleado traido es");
-      print(empleadoIDs);
+      /*print("El empleado traido es");
+      print(empleadoIDs);*/
       var res = await http.get(
           Uri.parse(api + conductores + '/' + empleadoIDs.toString()),
           headers: {"Content-type": "application/json"});
@@ -644,7 +821,7 @@ class _RutasState extends State<Rutas> {
                                           backgroundColor: Colors.deepPurple,
                                         );
 
-                                        print(rutasempleado[index].id);
+                                        //print(rutasempleado[index].id);
                                         await getpedidosruta(
                                             rutasempleado[index].id);
 
@@ -712,7 +889,7 @@ class _RutasState extends State<Rutas> {
                                                                 Center(
                                                                   child:
                                                                       Container(
-                                                                    child: Text(
+                                                                    child:const Text(
                                                                       "Editar campos",
                                                                       style: TextStyle(
                                                                           fontWeight: FontWeight
@@ -725,7 +902,7 @@ class _RutasState extends State<Rutas> {
                                                                     ),
                                                                   ),
                                                                 ),
-                                                                Container(
+                                                               /* Container(
                                                                   color: Colors
                                                                       .white,
                                                                   padding:
@@ -750,7 +927,7 @@ class _RutasState extends State<Rutas> {
                                                                         TextInputType
                                                                             .text,
                                                                   ),
-                                                                ),
+                                                                ),*/
                                                                 // Dropdown para conductores
                                                                 Container(
                                                                   width: MediaQuery.of(
@@ -769,40 +946,66 @@ class _RutasState extends State<Rutas> {
                                                                           .only(
                                                                           bottom:
                                                                               16),
-                                                                  child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
+                                                                  child: Row(
                                                                     children: [
-                                                                      const Text(
-                                                                          "Conductores"),
-                                                                      StatefulBuilder(
-                                                                        builder: (BuildContext
-                                                                                context,
-                                                                            StateSetter
-                                                                                setState) {
-                                                                          return DropdownButton<
-                                                                              Conductor>(
-                                                                            hint:
-                                                                                const Text('Selecciona un conductor'),
-                                                                            value:
-                                                                                selectedConductor,
-                                                                            items:
-                                                                                conductorget.map((Conductor chofer) {
-                                                                              return DropdownMenuItem<Conductor>(
-                                                                                value: chofer,
-                                                                                child: Text(chofer.nombres),
-                                                                              );
-                                                                            }).toList(),
-                                                                            onChanged:
-                                                                                (Conductor? newValue) {
-                                                                              setState(() {
-                                                                                selectedConductor = newValue;
-                                                                              });
-                                                                            },
-                                                                          );
-                                                                        },
+                                                                      Container(
+                                                                        width: 180,
+                                                                        child: Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment
+                                                                                  .start,
+                                                                          children: [
+                                                                            const Text(
+                                                                                "Conductores"),
+                                                                            StatefulBuilder(
+                                                                              builder: (BuildContext
+                                                                                      context,
+                                                                                  StateSetter
+                                                                                      setState) {
+                                                                                return DropdownButton<
+                                                                                    Conductor>(
+                                                                                  hint:
+                                                                                      const Text('Selecciona un conductor',style: TextStyle(
+                                                                                        fontSize: 13
+                                                                                      ),),
+                                                                                  value:
+                                                                                      selectedConductor,
+                                                                                  items:
+                                                                                      conductorget.map((Conductor chofer) {
+                                                                                    return DropdownMenuItem<Conductor>(
+                                                                                      value: chofer,
+                                                                                      child: Text(chofer.nombres),
+                                                                                    );
+                                                                                  }).toList(),
+                                                                                  onChanged:
+                                                                                      (Conductor? newValue) {
+                                                                                    setState(() {
+                                                                                      selectedConductor = newValue;
+                                                                                    });
+                                                                                  },
+                                                                                );
+                                                                              },
+                                                                            ),
+                                                                          ],
+                                                                        ),
                                                                       ),
+                                                                      Container(
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Container(
+                                                                        decoration: BoxDecoration(
+                                                                          color: Colors.yellow,
+                                                                          borderRadius: BorderRadius.circular(20)
+                                                                        ),
+                                                                        
+                                                                        child: IconButton(onPressed: (){
+                                                                          
+                                                                        },
+                                                                         icon:const Icon(Icons.update,color: Colors.red,)),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                )
                                                                     ],
                                                                   ),
                                                                 ),
@@ -824,45 +1027,71 @@ class _RutasState extends State<Rutas> {
                                                                           .only(
                                                                           bottom:
                                                                               16),
-                                                                  child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
+                                                                  child: Row(
                                                                     children: [
-                                                                      const Text(
-                                                                          "Vehículos"),
-                                                                      StatefulBuilder(
-                                                                        builder: (BuildContext
-                                                                                context,
-                                                                            StateSetter
-                                                                                setState) {
-                                                                          return DropdownButton<
-                                                                              Vehiculo>(
-                                                                            isExpanded:
-                                                                                true,
-                                                                            hint:
-                                                                                const Text('Selecciona un vehículo'),
-                                                                            value:
-                                                                                selectedVehiculo,
-                                                                            items:
-                                                                                vehiculos.map((Vehiculo auto) {
-                                                                              return DropdownMenuItem<Vehiculo>(
-                                                                                value: auto,
-                                                                                child: Text(auto.nombre_modelo),
-                                                                              );
-                                                                            }).toList(),
-                                                                            onChanged:
-                                                                                (Vehiculo? newValue) {
-                                                                              setState(() {
-                                                                                selectedVehiculo = newValue;
-                                                                              });
-                                                                            },
-                                                                          );
-                                                                        },
+                                                                      Container(
+                                                                        width: 180,
+                                                                        child: Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment
+                                                                                  .start,
+                                                                          children: [
+                                                                            const Text(
+                                                                                "Vehículos"),
+                                                                            StatefulBuilder(
+                                                                              builder: (BuildContext
+                                                                                      context,
+                                                                                  StateSetter
+                                                                                      setState) {
+                                                                                return DropdownButton<
+                                                                                    Vehiculo>(
+                                                                                  isExpanded:
+                                                                                      true,
+                                                                                  hint:
+                                                                                      const Text('Selecciona un vehículo',style: TextStyle(
+                                                                                        fontSize: 13
+                                                                                      ),),
+                                                                                  value:
+                                                                                      selectedVehiculo,
+                                                                                  items:
+                                                                                      vehiculos.map((Vehiculo auto) {
+                                                                                    return DropdownMenuItem<Vehiculo>(
+                                                                                      value: auto,
+                                                                                      child: Text(auto.nombre_modelo),
+                                                                                    );
+                                                                                  }).toList(),
+                                                                                  onChanged:
+                                                                                      (Vehiculo? newValue) {
+                                                                                    setState(() {
+                                                                                      selectedVehiculo = newValue;
+                                                                                    });
+                                                                                  },
+                                                                                );
+                                                                              },
+                                                                            ),
+                                                                          ],
+                                                                        ),
                                                                       ),
+                                                                     Container(
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Container(
+                                                                        decoration: BoxDecoration(
+                                                                          color: Colors.yellow,
+                                                                          borderRadius: BorderRadius.circular(20)
+                                                                        ),
+                                                                        
+                                                                        child: IconButton(onPressed: (){},
+                                                                         icon:const Icon(Icons.update,color: Colors.red,)),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                                      
                                                                     ],
                                                                   ),
                                                                 ),
+                                                                
                                                               ],
                                                             ),
                                                           ),
@@ -885,7 +1114,7 @@ class _RutasState extends State<Rutas> {
                                                                 const EdgeInsets
                                                                     .all(10),
                                                             color:
-                                                                Color.fromARGB(
+                                                                const Color.fromARGB(
                                                                     255,
                                                                     242,
                                                                     222,
@@ -940,48 +1169,36 @@ class _RutasState extends State<Rutas> {
                                                                           child:
                                                                               Column(
                                                                             children: [
-                                                                              Text(""), //distrito_de_pedido[index].nombre),
+                                                                              Text(distrito_de_pedido[index]), //distrito_de_pedido[index].nombre),
                                                                               Container(
                                                                                 width: 200,
                                                                                 height: 200,
                                                                                 margin: const EdgeInsets.all(5),
                                                                                 child: ListView.builder(
-                                                                                  itemCount: 5,
-                                                                                  /* distrito_pedido[
-                                                                                                    distrito_de_pedido[index].nombre]
-                                                                                                ?.length ??
-                                                                                            0,*/
+                                                                                  itemCount:distrito_pedido['${distrito_de_pedido[index]}']!.length,
                                                                                   itemBuilder: (BuildContext context, int index2) {
                                                                                     return StatefulBuilder(
                                                                                       builder: (BuildContext context, StateSetter setState) {
                                                                                         return Container(
-                                                                                            /*margin: const EdgeInsets.all(5),
-                                                                                                color: const Color.fromARGB(
-                                                                                                    255, 153, 218, 222),
-                                                                                                child: CheckboxListTile(
-                                                                                                  value: distrito_pedido[
-                                                          distrito_de_pedido[index]
-                                                              .nombre]?[index2]
-                                                      .seleccionado,
-                                                                                                  onChanged: (bool? value) {
-                                                                                                    setState(() {
-                                                      distrito_pedido[
-                                                              distrito_de_pedido[
-                                                                      index]
-                                                                  .nombre]?[index2]
-                                                          .seleccionado = value!;
-                                                                                                    });
-                                                                                                  },
-                                                                                                  title: Text(
-                                                      "N° ${distrito_pedido[distrito_de_pedido[index].nombre]?[index2].id}"),
-                                                                                                  subtitle: Text(distrito_pedido[
-                                                              distrito_de_pedido[
-                                                                      index]
-                                                                  .nombre]?[index2]
-                                                          .nombre ??
-                                                      ""),
-                                                                                                ),*/
-                                                                                            );
+                                                                                                      margin: const EdgeInsets.all(5),
+                                                                                                      color: const Color.fromARGB(255, 153, 218, 222),
+                                                                                                      child: CheckboxListTile(
+                                                                                                        value: distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado,
+                                                                                                        onChanged: (bool? value) {
+                                                                                                          setState(() {
+                                                                                                            //  print("seleccionando");
+
+                                                                                                            distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado = value!;
+                                                                                                            // print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].seleccionado);
+                                                                                                            //print(distrito_pedido['${distrito_de_pedido[index]}']?[index2].id);
+
+                                                                                                            idPedidosSeleccionados.add(distrito_pedido['${distrito_de_pedido[index]}']![index2].id);
+                                                                                                          });
+                                                                                                        },
+                                                                                                        title: Text("N° ${distrito_pedido['${distrito_de_pedido[index]}']?[index2].id}"),
+                                                                                                        subtitle: Text("${distrito_pedido['${distrito_de_pedido[index]}']?[index2].nombre}"),
+                                                                                                      ),
+                                                                                                    );
                                                                                       },
                                                                                     );
                                                                                   },
@@ -1017,7 +1234,7 @@ class _RutasState extends State<Rutas> {
                                                                 const EdgeInsets
                                                                     .all(10),
                                                             color:
-                                                                Color.fromARGB(
+                                                                const Color.fromARGB(
                                                                     255,
                                                                     125,
                                                                     106,
@@ -1049,7 +1266,8 @@ class _RutasState extends State<Rutas> {
                                                                   //color:Colors.green,
                                                                   height:
                                                                       320.00,
-                                                                  child: ListView
+                                                                  child:pedidosruta
+                                                                            .length > 0 ? ListView
                                                                       .builder(
                                                                     itemCount:
                                                                         pedidosruta
@@ -1136,7 +1354,7 @@ class _RutasState extends State<Rutas> {
                                                                                     context: context,
                                                                                     builder: (BuildContext context) {
                                                                                       return AlertDialog(
-                                                                                        title: const Text('¿Estás seguro que deseas eliminar?'),
+                                                                                        title: const Text('¿Estás seguro que deseas revertir o eliminar?'),
                                                                                         //content: const Text('AlertDialog description'),
                                                                                         actions: [
                                                                                           Row(
@@ -1147,7 +1365,32 @@ class _RutasState extends State<Rutas> {
                                                                                                 child: const Text('Cancelar'),
                                                                                               ),
                                                                                               TextButton(
-                                                                                                onPressed: () {},
+                                                                                                onPressed: () async{
+                                                                                                  await deleterevertir(pedidosruta[index].id);
+                                                                                                  if(mensajedelete=='Pedido revertido o eliminado'){
+                                                                                                    showDialog(context: context, builder:(BuildContext context){
+                                                                                                      return AlertDialog(
+                                                                                                        title: Row(
+                                                                                                          children: [
+                                                                                                            Text(mensajedelete,style:const TextStyle(
+                                                                                                              fontWeight: FontWeight.w600
+                                                                                                            ),),
+                                                                                                            TextButton(onPressed: (){
+                                                                                                              Navigator.pop(context);
+                                                                                                              Navigator.pop(context);
+                                                                                                             // Navigator.pop(context);
+                                                                                                              setState(() {
+                                                                                                                
+                                                                                                              });
+                                                                                                            },
+                                                                                                             child: const Text("OK",style: TextStyle(color: Color.fromARGB(255, 39, 48, 129)),))
+                                                                                                          ],
+                                                                                                        ),
+                                                                                                      );
+                                                                                                    });
+                                                                                                  
+                                                                                                  }
+                                                                                                },
                                                                                                 child: const Text('Si'),
                                                                                               ),
                                                                                             ],
@@ -1155,6 +1398,7 @@ class _RutasState extends State<Rutas> {
                                                                                         ],
                                                                                       );
                                                                                     });
+                                                                                   
 
                                                                                 // distrito_de_pedido.removeAt(index);
                                                                               });
@@ -1163,6 +1407,10 @@ class _RutasState extends State<Rutas> {
                                                                         ),
                                                                       );
                                                                     },
+                                                                  ):const Center(
+                                                                    child:  Text("No hay pedidos en esta ruta",style: TextStyle(
+                                                                      fontWeight: FontWeight.bold
+                                                                    ),),
                                                                   ),
                                                                 ),
                                                               ],
@@ -1177,16 +1425,71 @@ class _RutasState extends State<Rutas> {
                                                               MainAxisAlignment
                                                                   .center,
                                                           children: [
-                                                            ElevatedButton(
-                                                                onPressed:
-                                                                    () {},
-                                                                child: Text(
-                                                                    "Cancelar")),
-                                                            ElevatedButton(
-                                                                onPressed:
-                                                                    () {},
-                                                                child: Text(
-                                                                    "Confirmar"))
+                                                            Container(
+                                                              width: 100,
+                                                              height: 100,
+                                                              //color: Colors.amber,
+                                                              child: ElevatedButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                        Navigator.pop(context);
+                                                                        setState(() {
+                                                                          idPedidosSeleccionados = [];
+                                                                        });
+
+                                                                      },
+                                                                      style: ButtonStyle(
+                                                                        elevation: WidgetStateProperty.all(5),
+                                                                        backgroundColor: WidgetStateProperty.all(Colors.white)
+                                                                      ),
+                                                                  child:const Text(
+                                                                      "Cancelar",style: TextStyle(
+                                                                        fontSize: 13
+                                                                      ),)),
+                                                            ),
+                                                            const SizedBox(width: 10,),
+                                                            Container(
+                                                              width: 100,
+                                                              height: 100,
+                                                              child: ElevatedButton(
+                                                                  onPressed:
+                                                                      () async{
+                                                                        showDialog(
+                                                                                        context: context,
+                                                                                        builder: (BuildContext context) {
+                                                                                          return const AlertDialog(
+                                                                                            content: Row(
+                                                                                              children: [
+                                                                                                CircularProgressIndicator(
+                                                                                                  backgroundColor: Colors.green,
+                                                                                                ),
+                                                                                                SizedBox(width: 20),
+                                                                                                Text("Cargando..."),
+                                                                                              ],
+                                                                                            ),
+                                                                                          );
+                                                                                        },
+                                                                                      );
+                                                                        await updatePedidoRuta(rutasempleado[index].id, "en proceso");
+                                                                         Navigator.pop(context);
+                                                                                      Navigator.pop(context);
+                                                                                      setState(() {
+
+                                                                                       
+                                                                                      });
+                                                                       // print("id pedidos");
+                                                                       // print(idPedidosSeleccionados.length);
+                                                                       // idPedidosSeleccionados = [];
+                                                                      },
+                                                                      style: ButtonStyle(
+                                                                        elevation: WidgetStateProperty.all(4),
+                                                                        backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 61, 44, 130))
+                                                                      ),
+                                                                  child: const Text(
+                                                                      "Confirmar",style: TextStyle(
+                                                                        fontSize: 11,
+                                                                        color: Colors.white),)),
+                                                            )
                                                           ],
                                                         ),
                                                       )

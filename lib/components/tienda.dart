@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 
-class Tienda extends StatefulWidget {
-  const Tienda({Key? key}) : super(key: key);
+class Tienda2 extends StatefulWidget {
+  const Tienda2({Key? key}) : super(key: key);
 
   @override
-  State<Tienda> createState() => _TiendaState();
+  State<Tienda2> createState() => _Tienda2State();
 }
 
-class _TiendaState extends State<Tienda> {
+class _Tienda2State extends State<Tienda2> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override

@@ -95,8 +95,8 @@ class _AgendadosState extends State<Agendados> {
 
   Future<dynamic> getPedidos() async {
     try {
-      print("---------dentro ..........................get pedidos");
-      print(apipedidos);
+      //print("---------dentro ..........................get pedidos");
+      //print(apipedidos);
       SharedPreferences empleadoShare = await SharedPreferences.getInstance();
 
       var empleadoIDs = 1; //empleadoShare.getInt('empleadoID');
@@ -127,8 +127,8 @@ class _AgendadosState extends State<Agendados> {
 
         setState(() {
           pedidosget = tempPedido;
-          print("---pedidos get");
-          print(pedidosget.length);
+         // print("---pedidos get");
+         // print(pedidosget.length);
 
           // TRAIGO LOS DISTRITOS DE LOS PEDIDOS DE AYER - SOLO LOS DE AYER
           for (var j = 0; j < pedidosget.length; j++) {
@@ -147,29 +147,29 @@ class _AgendadosState extends State<Agendados> {
           setState(() {
             distrito_de_pedido = distritosSet.toList();
           });
-          print("distritos");
-          print(distrito_de_pedido);
+          //print("distritos");
+          //print(distrito_de_pedido);
 
           // AHORA ITERO EN TODOS LOS PEDIDOS Y LO RELACIONO SOLO CON LOS DISTRITOS QUE OBTUVE
           for (var x = 0; x < distrito_de_pedido.length; x++) {
-            print(distrito_de_pedido[x]);
+           // print(distrito_de_pedido[x]);
             for (var j = 0; j < pedidosget.length; j++) {
               fechaparseadas = DateTime.parse(pedidosget[j].fecha.toString());
               if (pedidosget[j].estado == 'pendiente' || pedidosget[j].estado == 'en proceso') {
                 if (pedidosget[j].tipo == 'normal' ||
                     pedidosget[j].tipo == 'express') {
-                  print("----------TIPO");
-                  print(pedidosget[j].tipo);
+                 // print("----------TIPO");
+                 // print(pedidosget[j].tipo);
                   if (fechaparseadas.day != now.day) {
                     if (distrito_de_pedido[x] == pedidosget[j].distrito) {
                       nuevopedidodistrito.add(pedidosget[j]);
-                      print("nuevo pedido distrito ID:");
+                      /*print("nuevo pedido distrito ID:");
                       print(pedidosget[j].id);
                       print(pedidosget[j].distrito);
                       print(pedidosget[j].nombre);
                       print(pedidosget[j].apellidos);
                       print(pedidosget[j].tipo);
-                      print(pedidosget[j].total);
+                      print(pedidosget[j].total);*/
                     }
                   }
                 }
@@ -184,8 +184,8 @@ class _AgendadosState extends State<Agendados> {
                 nuevopedidodistrito =
                     []; // SI YA TERMINE DE AÑADIR AL MAP, AHORA SOLO LIMPIO
               });
-              print("tamaño de mapa");
-              print(distrito_pedido['${distrito_de_pedido[x]}']?.length);
+              //print("tamaño de mapa");
+              //print(distrito_pedido['${distrito_de_pedido[x]}']?.length);
             }
           }
 
@@ -207,8 +207,8 @@ class _AgendadosState extends State<Agendados> {
                       pedidosget[i].longitud = coordGET.longitude;
 
                       agendados.add(pedidosget[i]);
-                      print("......AGENDADOS");
-                      print(agendados);
+                      //print("......AGENDADOS");
+                      //print(agendados);
                     });
                   }
                 }
@@ -226,8 +226,8 @@ class _AgendadosState extends State<Agendados> {
           marcadoresPut("agendados");
           setState(() {});
           number = agendados.length;
-          print("ageng tama");
-          print(number);
+          //print("ageng tama");
+          //print(number);
         }
       }
     } catch (e) {
@@ -262,15 +262,13 @@ class _AgendadosState extends State<Agendados> {
               height: 150,
               child: GestureDetector(
                 onTap: () {
-                  print("dentro-------------------------");
+                  //print("dentro-------------------------");
                   setState(() {
-                    print(mapaLatPedido[
-                            LatLng(coordenada.latitude, coordenada.longitude)]
-                        ?.estado);
+                   
                     mapaLatPedido[
                             LatLng(coordenada.latitude, coordenada.longitude)]
                         ?.estado = 'en proceso';
-                    print("------estadito");
+                   
 
                     Pedido? pedidoencontrado = mapaLatPedido[
                         LatLng(coordenada.latitude, coordenada.longitude)];

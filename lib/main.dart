@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
         
         useMaterial3: true,
       ),
-      home: Login1()
+      home:const Login1()
     );
   }
 }

@@ -58,8 +58,8 @@ class _Login1State extends State<Login1> {
 
           //  print("STATUS");
           //  print(status);
-          print("ROL");
-          print(rol);
+          //print("ROL");
+          //print(rol);
         }
         //ADMINISTRADOR
         else if (data['usuario']['rol_id'] == 1) {
@@ -73,8 +73,8 @@ class _Login1State extends State<Login1> {
           });
           //print("STATUS");
           //print(status);
-          print("ROL");
-          print(rol);
+          //print("ROL");
+          //print(rol);
         }
 
         /// SETEAMOS EL PROVIDER CON UN USUARIO
@@ -87,8 +87,8 @@ class _Login1State extends State<Login1> {
         });
         //print("STATUS");
         //print(status);
-        print("ROL");
-        print(rol);
+        //print("ROL");
+        //print(rol);
       } else if (res.statusCode == 404) {
         //var data = json.decode(res.body);
 
@@ -99,8 +99,8 @@ class _Login1State extends State<Login1> {
         });
         //print("STATUS");
         //print(status);
-        print("ROL");
-        print(rol);
+        //print("ROL");
+        //print(rol);
       }
     } catch (e) {
       throw Exception('$e');
@@ -239,7 +239,7 @@ class _Login1State extends State<Login1> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const Menu(),
+                              builder: (context) => Menu(),
                             ),
                           );
                         } else if (rol == 1) {
