@@ -1107,9 +1107,27 @@ class _RuteoState extends State<Ruteo> {
                                     borderRadius: BorderRadius.circular(100)),
                                 child: ElevatedButton(
                                   onPressed: () async {
+                                     showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return const AlertDialog(
+                                                content: Row(
+                                                  children: [
+                                                    CircularProgressIndicator(
+                                                      backgroundColor:
+                                                          Colors.green,
+                                                    ),
+                                                    SizedBox(width: 20),
+                                                    Text("Creando informe...",style: TextStyle(fontWeight: FontWeight.w600),),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          );
                                     await getEmpleadoPedido(
                                         userProvider.user!.id);
                                     await createPdf();
+                                    Navigator.pop(context);
                                   },
                                   child: Text(
                                     "Informe",
